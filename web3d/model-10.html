@@ -1,84 +1,68 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MODEL UNDER CONSTRUCTION // OMEGA.SYS</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>GOD TIER // OMEGA.10</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap" rel="stylesheet">
 <style>
-  :root { --c: #00f0ff; --bg: #03040a; }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { 
-    background: var(--bg); color: #fff; overflow: hidden; 
-    font-family: 'Rajdhani', sans-serif; height: 100vh;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    cursor: crosshair;
-  }
-  #bg { position: fixed; inset: 0; z-index: -1; opacity: 0.3; }
-  .loader-box { text-align: center; z-index: 10; animation: fadeIn 2s ease; }
-  .eyebrow { font-family: 'Orbitron', sans-serif; font-size: 0.7rem; letter-spacing: 0.5em; color: var(--c); margin-bottom: 2rem; opacity: 0.6; }
-  .title { font-family: 'Orbitron', sans-serif; font-size: clamp(2rem, 6vw, 4rem); font-weight: 900; letter-spacing: -1px; margin-bottom: 1rem; text-shadow: 0 0 30px var(--c); }
-  .status { font-family: 'Orbitron', sans-serif; font-size: 0.8rem; letter-spacing: 0.2em; margin-bottom: 3rem; color: rgba(255,255,255,0.4); }
-  .status span { animation: blink 1s infinite; }
-  
-  .btn-back {
-    text-decoration: none; color: #000; background: var(--c);
-    font-family: 'Orbitron', sans-serif; font-size: 0.7rem; font-weight: 700;
-    padding: 1.2rem 2.5rem; border-radius: 4px; letter-spacing: 0.3em;
-    box-shadow: 0 0 40px rgba(0,240,255,0.3); transition: all 0.4s;
-  }
-  .btn-back:hover { transform: scale(1.05); box-shadow: 0 0 60px rgba(0,240,255,0.5); }
-
-  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-  
-  canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+  body { margin:0; padding:0; background:#000; overflow:hidden; font-family:'Orbitron', sans-serif; cursor:none; }
+  canvas { position:fixed; inset:0; z-index:0; }
+  #ui { position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:10; pointer-events:none; mix-blend-mode:difference; }
+  .title { font-size:clamp(4rem, 15vw, 12rem); color:#fff; margin:0; line-height:1; letter-spacing:2vw; padding-left:2vw; animation:shake 0.5s infinite alternate; }
+  .sub { font-size:1rem; color:#fff; letter-spacing:1em; margin-top:2rem; text-transform:uppercase; animation:shake 1s infinite alternate-reverse; }
+  .btn { pointer-events:all; margin-top:5rem; padding:1.5rem 4rem; background:#fff; color:#000; text-decoration:none; font-size:1rem; font-weight:900; letter-spacing:0.3em; transition:all 0.2s; mix-blend-mode:normal; }
+  .btn:hover { background:transparent; color:#fff; border:1px solid #fff; box-shadow:0 0 50px #fff; }
+  @keyframes shake { 0%{transform:translate(1px,1px) rotate(0deg);} 100%{transform:translate(-1px,-2px) rotate(-1deg);} }
+  .vignette { position:fixed; inset:0; background:radial-gradient(circle, transparent 40%, #000 120%); pointer-events:none; z-index:5; }
 </style>
 </head>
 <body>
-  <canvas id="canvas"></canvas>
-  <div class="loader-box">
-    <div class="eyebrow">OMEGA_SYSTEM // PROTOCOL_01</div>
-    <h1 class="title">MODEL_UNDER_CONSTRUCTION</h1>
-    <div class="status">COMPILING DIMENSIONS<span>...</span></div>
-    <a href="../web3d.html" class="btn-back">VOLVER AL HUB</a>
-  </div>
+<canvas id="c"></canvas>
+<div class="vignette"></div>
+<div id="ui">
+  <h1 class="title">GOD</h1>
+  <div class="sub">SINGULARITY REACHED</div>
+  <a href="../web3d.html" class="btn">AWAKEN</a>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+  const s = new THREE.Scene();
+  const c = new THREE.PerspectiveCamera(90, innerWidth/innerHeight, 0.1, 1000); c.position.z = 10;
+  const r = new THREE.WebGLRenderer({canvas:document.getElementById('c'), antialias:true});
+  r.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); r.setSize(innerWidth, innerHeight);
 
-  <script>
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    let w, h;
-    function resize() {
-      w = canvas.width = window.innerWidth;
-      h = canvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resize);
-    resize();
+  // Intense Abstract Geometry
+  const geo = new THREE.TorusKnotGeometry(3, 1, 200, 32);
+  const mat = new THREE.MeshStandardMaterial({color:0xffb800, metalness:1, roughness:0.2, wireframe:true});
+  const mesh = new THREE.Mesh(geo, mat); s.add(mesh);
 
-    const particles = [];
-    for(let i=0; i<100; i++) {
-      particles.push({
-        x: Math.random() * w, y: Math.random() * h,
-        vx: (Math.random()-0.5) * 0.5, vy: (Math.random()-0.5) * 0.5,
-        size: Math.random() * 2
-      });
-    }
+  const geo2 = new THREE.IcosahedronGeometry(6, 1);
+  const mat2 = new THREE.MeshBasicMaterial({color:0xffffff, wireframe:true, transparent:true, opacity:0.1});
+  const mesh2 = new THREE.Mesh(geo2, mat2); s.add(mesh2);
 
-    function animate() {
-      ctx.fillStyle = 'rgba(3, 4, 10, 0.1)';
-      ctx.fillRect(0, 0, w, h);
-      ctx.fillStyle = '#00f0ff';
-      particles.forEach(p => {
-        p.x += p.vx; p.y += p.vy;
-        if(p.x < 0 || p.x > w) p.vx *= -1;
-        if(p.y < 0 || p.y > h) p.vy *= -1;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
-        ctx.fill();
-      });
-      requestAnimationFrame(animate);
-    }
-    animate();
-  </script>
+  const l1 = new THREE.PointLight(0xffffff, 5, 50); l1.position.set(0,0,0); s.add(l1);
+  
+  let mx=0, my=0; window.addEventListener('mousemove', e => { mx=(e.clientX/innerWidth-0.5)*2; my=-(e.clientY/innerHeight-0.5)*2; });
+  window.addEventListener('resize', () => { c.aspect=innerWidth/innerHeight; c.updateProjectionMatrix(); r.setSize(innerWidth,innerHeight); });
+
+  function anim(t) {
+    requestAnimationFrame(anim);
+    const time = t * 0.005; // Fast erratic
+    mesh.rotation.x = time; mesh.rotation.y = time*1.2;
+    mesh2.rotation.x = -time*0.5; mesh2.rotation.y = -time*0.5;
+    
+    const sFact = 1 + Math.sin(time*5)*0.1; mesh.scale.set(sFact,sFact,sFact);
+    
+    // Erratic camera
+    c.position.x += (mx*2 + Math.sin(time*10)*0.5 - c.position.x)*0.1; 
+    c.position.y += (my*2 + Math.cos(time*12)*0.5 - c.position.y)*0.1;
+    c.lookAt(0,0,0);
+    
+    // Flicker light
+    l1.intensity = 2 + Math.random()*5;
+    
+    r.render(s, c);
+  } anim(0);
+</script>
 </body>
 </html>

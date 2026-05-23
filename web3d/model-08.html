@@ -1,84 +1,80 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MODEL UNDER CONSTRUCTION // OMEGA.SYS</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>FUTURE CITY // OMEGA.08</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  :root { --c: #00f0ff; --bg: #03040a; }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { 
-    background: var(--bg); color: #fff; overflow: hidden; 
-    font-family: 'Rajdhani', sans-serif; height: 100vh;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    cursor: crosshair;
-  }
-  #bg { position: fixed; inset: 0; z-index: -1; opacity: 0.3; }
-  .loader-box { text-align: center; z-index: 10; animation: fadeIn 2s ease; }
-  .eyebrow { font-family: 'Orbitron', sans-serif; font-size: 0.7rem; letter-spacing: 0.5em; color: var(--c); margin-bottom: 2rem; opacity: 0.6; }
-  .title { font-family: 'Orbitron', sans-serif; font-size: clamp(2rem, 6vw, 4rem); font-weight: 900; letter-spacing: -1px; margin-bottom: 1rem; text-shadow: 0 0 30px var(--c); }
-  .status { font-family: 'Orbitron', sans-serif; font-size: 0.8rem; letter-spacing: 0.2em; margin-bottom: 3rem; color: rgba(255,255,255,0.4); }
-  .status span { animation: blink 1s infinite; }
-  
-  .btn-back {
-    text-decoration: none; color: #000; background: var(--c);
-    font-family: 'Orbitron', sans-serif; font-size: 0.7rem; font-weight: 700;
-    padding: 1.2rem 2.5rem; border-radius: 4px; letter-spacing: 0.3em;
-    box-shadow: 0 0 40px rgba(0,240,255,0.3); transition: all 0.4s;
-  }
-  .btn-back:hover { transform: scale(1.05); box-shadow: 0 0 60px rgba(0,240,255,0.5); }
-
-  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-  
-  canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+  body { margin:0; padding:0; background:#050000; color:#ff0055; font-family:'Rajdhani', sans-serif; overflow:hidden; }
+  canvas { position:fixed; inset:0; z-index:0; }
+  #hud { position:absolute; inset:0; pointer-events:none; z-index:10; padding:2rem; }
+  .panel { position:absolute; bottom:0; left:0; width:40vw; min-width:300px; padding:3rem 2rem; background:rgba(20,0,5,0.8); backdrop-filter:blur(10px); clip-path:polygon(0 0, 85% 0, 100% 100%, 0 100%); border-top:2px solid #ff0055; pointer-events:all; }
+  .title { font-family:'Orbitron', sans-serif; font-size:2.5rem; margin-bottom:0.5rem; text-shadow:0 0 15px #ff0055; }
+  .desc { font-size:1rem; color:rgba(255,255,255,0.6); margin-bottom:2rem; }
+  .btn { display:inline-block; padding:1rem 2rem; background:#ff0055; color:#000; text-decoration:none; font-weight:700; text-transform:uppercase; letter-spacing:0.2em; border-radius:2px; box-shadow:0 0 20px rgba(255,0,85,0.4); transition:all 0.3s; }
+  .btn:hover { background:#fff; box-shadow:0 0 30px #fff; }
+  .crosshair { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:40px; height:40px; pointer-events:none; }
+  .crosshair::before, .crosshair::after { content:''; position:absolute; background:#ff0055; }
+  .crosshair::before { top:19px; left:0; width:40px; height:2px; } .crosshair::after { left:19px; top:0; width:2px; height:40px; }
+  @media(max-width:768px){ .panel{width:100%; clip-path:none; border-top:2px solid #ff0055;} .title{font-size:2rem;} }
 </style>
 </head>
 <body>
-  <canvas id="canvas"></canvas>
-  <div class="loader-box">
-    <div class="eyebrow">OMEGA_SYSTEM // PROTOCOL_01</div>
-    <h1 class="title">MODEL_UNDER_CONSTRUCTION</h1>
-    <div class="status">COMPILING DIMENSIONS<span>...</span></div>
-    <a href="../web3d.html" class="btn-back">VOLVER AL HUB</a>
+<canvas id="c"></canvas>
+<div class="crosshair"></div>
+<div id="hud">
+  <div class="panel">
+    <div class="title">SECTOR_7G</div>
+    <div class="desc">Metrópolis instanciada. Procesamiento masivo de geometrías urbanas bajo lluvia de datos.</div>
+    <a href="../web3d.html" class="btn">EVACUAR SECTOR</a>
   </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+  const s = new THREE.Scene(); s.fog = new THREE.FogExp2(0x050000, 0.02);
+  const c = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 500); c.position.set(0, 15, 40);
+  const r = new THREE.WebGLRenderer({canvas:document.getElementById('c'), antialias:true});
+  r.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); r.setSize(innerWidth, innerHeight);
 
-  <script>
-    const canvas = document.getElementById('canvas');
-    const ctx = canvas.getContext('2d');
-    let w, h;
-    function resize() {
-      w = canvas.width = window.innerWidth;
-      h = canvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resize);
-    resize();
+  // Instanced City
+  const count = 1000;
+  const geo = new THREE.BoxGeometry(2, 1, 2);
+  const mat = new THREE.MeshStandardMaterial({color:0x222222, roughness:0.8, metalness:0.2});
+  const imesh = new THREE.InstancedMesh(geo, mat, count);
+  const dummy = new THREE.Object3D();
+  for(let i=0; i<count; i++){
+    const h = 2 + Math.random()*20;
+    dummy.position.set((Math.random()-0.5)*200, h/2, (Math.random()-0.5)*200);
+    dummy.scale.set(1, h, 1); dummy.updateMatrix();
+    imesh.setMatrixAt(i, dummy.matrix);
+  }
+  s.add(imesh);
 
-    const particles = [];
-    for(let i=0; i<100; i++) {
-      particles.push({
-        x: Math.random() * w, y: Math.random() * h,
-        vx: (Math.random()-0.5) * 0.5, vy: (Math.random()-0.5) * 0.5,
-        size: Math.random() * 2
-      });
-    }
+  // Neon Lights
+  const l1 = new THREE.PointLight(0xff0055, 5, 100); l1.position.set(0,20,0); s.add(l1);
+  const l2 = new THREE.PointLight(0x00aaff, 3, 100); l2.position.set(20,10,-20); s.add(l2);
+  const l3 = new THREE.AmbientLight(0x110000); s.add(l3);
 
-    function animate() {
-      ctx.fillStyle = 'rgba(3, 4, 10, 0.1)';
-      ctx.fillRect(0, 0, w, h);
-      ctx.fillStyle = '#00f0ff';
-      particles.forEach(p => {
-        p.x += p.vx; p.y += p.vy;
-        if(p.x < 0 || p.x > w) p.vx *= -1;
-        if(p.y < 0 || p.y > h) p.vy *= -1;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
-        ctx.fill();
-      });
-      requestAnimationFrame(animate);
-    }
-    animate();
-  </script>
+  // Hovering cars (particles)
+  const pc=200; const pg=new THREE.BufferGeometry(); const pa=new Float32Array(pc*3);
+  for(let i=0;i<pc;i++){ pa[i*3]=(Math.random()-0.5)*100; pa[i*3+1]=5+Math.random()*15; pa[i*3+2]=(Math.random()-0.5)*100; }
+  pg.setAttribute('position', new THREE.BufferAttribute(pa,3));
+  const pm=new THREE.PointsMaterial({color:0xff0055, size:0.5});
+  const cars = new THREE.Points(pg, pm); s.add(cars);
+
+  let mx=0, my=0; window.addEventListener('mousemove', e => { mx=(e.clientX/innerWidth-0.5)*2; my=-(e.clientY/innerHeight-0.5)*2; });
+  window.addEventListener('resize', () => { c.aspect=innerWidth/innerHeight; c.updateProjectionMatrix(); r.setSize(innerWidth,innerHeight); });
+
+  function anim() {
+    requestAnimationFrame(anim);
+    c.position.x += (mx*20 - c.position.x)*0.05; c.position.y += (15 + my*10 - c.position.y)*0.05;
+    c.lookAt(0, 5, -20);
+    // Move cars
+    const pos = pg.attributes.position.array;
+    for(let i=0; i<pc; i++){ pos[i*3+2] -= 0.5; if(pos[i*3+2] < -50) pos[i*3+2] = 50; }
+    pg.attributes.position.needsUpdate = true;
+    r.render(s, c);
+  } anim();
+</script>
 </body>
 </html>
