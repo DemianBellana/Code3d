@@ -3,61 +3,234 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>QUANTUM CORP // OMEGA.02</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
 <style>
-  body { margin:0; padding:0; background:#f0f2f5; color:#050505; font-family:'Inter', sans-serif; overflow:hidden; cursor:crosshair; }
+  :root {
+    --c-primary: #00ffe0;
+    --c-accent: #a855f7;
+    --bg-deep: #05060f;
+    --glass: rgba(255, 255, 255, 0.02);
+    --border: rgba(255, 255, 255, 0.08);
+  }
+  
+  body { margin:0; padding:0; background: var(--bg-deep); color:#fff; font-family:'Rajdhani', sans-serif; overflow:hidden; cursor:none; }
   canvas { position:fixed; inset:0; z-index:0; }
-  #ui { position:relative; z-index:10; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; pointer-events:none; }
-  .logo { position:absolute; top:3rem; left:3rem; font-size:0.7rem; font-weight:700; letter-spacing:0.4em; }
-  .title { font-size:clamp(3rem, 8vw, 8rem); font-weight:200; letter-spacing:-0.04em; mix-blend-mode:difference; color:#fff; text-align:center; line-height:1; }
-  .subtitle { margin-top:1rem; font-size:0.8rem; letter-spacing:0.3em; text-transform:uppercase; color:rgba(0,0,0,0.4); mix-blend-mode:difference; color:#fff; }
-  .btn { pointer-events:all; margin-top:4rem; padding:1rem 3rem; background:transparent; border:1px solid #050505; color:#050505; text-decoration:none; font-size:0.7rem; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; transition:all 0.4s; mix-blend-mode:difference; border-color:#fff; color:#fff; }
-  .btn:hover { background:#fff; color:#000; padding:1rem 4rem; }
-  @media(max-width:768px){ .logo{top:1.5rem;left:1.5rem;} }
+
+  /* ─── UI HUD ─── */
+  #ui { position:fixed; inset:0; z-index:10; pointer-events:none; display:flex; flex-direction:column; justify-content:space-between; padding:3rem; }
+  
+  .hud-top { display:flex; justify-content:space-between; align-items:flex-start; animation: fadeDown 1.5s ease; }
+  .logo { font-family:'Orbitron', sans-serif; font-weight:900; letter-spacing:0.4em; font-size:1.2rem; color:var(--c-primary); text-shadow:0 0 20px rgba(0,255,224,0.4); }
+  .sys-status { font-family:'Orbitron', monospace; font-size:0.6rem; color:rgba(255,255,255,0.4); text-align:right; letter-spacing:0.2em; }
+  
+  .center-content { text-align:center; transform:translateY(-5vh); }
+  .title { font-family:'Orbitron', sans-serif; font-size:clamp(3rem, 10vw, 7rem); font-weight:900; letter-spacing:-0.05em; line-height:0.85; margin:0; background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.4) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent; opacity:0; }
+  .subtitle { font-size:0.9rem; letter-spacing:0.6em; text-transform:uppercase; color:var(--c-primary); margin-top:1.5rem; opacity:0; }
+
+  .hud-bottom { display:flex; justify-content:space-between; align-items:flex-end; animation: fadeUp 1.5s ease; }
+  .data-grid { display:grid; grid-template-columns: repeat(2, 1fr); gap:2rem; }
+  .data-item { border-left:1px solid var(--c-primary); padding-left:1rem; }
+  .data-lbl { font-size:0.6rem; color:rgba(255,255,255,0.3); text-transform:uppercase; letter-spacing:0.2em; }
+  .data-val { font-size:1.1rem; font-weight:700; color:#fff; }
+
+  .btn-hub { pointer-events:all; padding:1.2rem 3rem; background:rgba(255,255,255,0.03); border:1px solid var(--border); color:#fff; text-decoration:none; font-family:'Orbitron', sans-serif; font-size:0.7rem; font-weight:700; letter-spacing:0.3em; text-transform:uppercase; transition:all 0.4s; backdrop-filter:blur(20px); border-radius:4px; }
+  .btn-hub:hover { border-color:var(--c-primary); background:rgba(0,255,224,0.05); box-shadow:0 0 40px rgba(0,255,224,0.2); transform:translateY(-5px); }
+
+  /* ─── CURSOR ─── */
+  #cursor { position:fixed; width:8px; height:8px; background:#fff; border-radius:50%; pointer-events:none; z-index:10000; transform:translate(-50%,-50%); mix-blend-mode:difference; }
+  #cursor-ring { position:fixed; width:40px; height:40px; border:1px solid rgba(0,255,224,0.4); border-radius:50%; pointer-events:none; z-index:9999; transform:translate(-50%,-50%); transition:width 0.3s, height 0.3s, border-color 0.3s; }
+
+  /* ─── FX ─── */
+  .vignette { position:fixed; inset:0; background:radial-gradient(circle at 50% 50%, transparent 30%, rgba(0,0,0,0.9) 120%); z-index:1; pointer-events:none; }
+  .noise { position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: 0.03; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+
+  @keyframes fadeDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+  @media(max-width:768px){ 
+    #ui { padding:1.5rem; }
+    .data-grid { display:none; }
+    .title { font-size:3.5rem; }
+    .subtitle { font-size:0.7rem; letter-spacing:0.3em; }
+    .btn-hub { width:100%; text-align:center; padding:1rem; }
+  }
 </style>
 </head>
 <body>
+
+<div class="noise"></div>
+<div class="vignette"></div>
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
 <canvas id="c"></canvas>
+
 <div id="ui">
-  <div class="logo">QUANTUM_SYS</div>
-  <h1 class="title">ABSOLUTE<br>CLARITY</h1>
-  <div class="subtitle">Next Generation Corporate Architecture</div>
-  <a href="../web3d.html" class="btn">RETURN TO HUB</a>
+  <div class="hud-top">
+    <div class="logo">QUANTUM<span>.</span>SYS</div>
+    <div class="sys-status">NODE_02 // STABLE<br><span id="clock">00:00:00</span></div>
+  </div>
+
+  <div class="center-content">
+    <h1 class="title" id="main-title">QUANTUM<br>CORP</h1>
+    <div class="subtitle" id="main-sub">The Architecture of Silence</div>
+  </div>
+
+  <div class="hud-bottom">
+    <div class="data-grid">
+      <div class="data-item">
+        <div class="data-lbl">Refraction</div>
+        <div class="data-val" id="val-1">1.45 IOR</div>
+      </div>
+      <div class="data-item">
+        <div class="data-lbl">Processing</div>
+        <div class="data-val" id="val-2">0.4ms</div>
+      </div>
+    </div>
+    <a href="../web3d.html" class="btn-hub">EXIT INTERFACE</a>
+  </div>
 </div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
 <script>
-  const s = new THREE.Scene(); s.fog = new THREE.Fog(0xf0f2f5, 10, 50);
-  const c = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 0.1, 100); c.position.z = 20;
-  const r = new THREE.WebGLRenderer({canvas:document.getElementById('c'), antialias:true, alpha:true});
-  r.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); r.setSize(innerWidth, innerHeight);
-  
-  // High-end glass material
-  const geo = new THREE.IcosahedronGeometry(5, 2);
-  const mat = new THREE.MeshPhysicalMaterial({ transmission:1, opacity:1, metalness:0.1, roughness:0.05, ior:1.5, thickness:2.5, specularIntensity:1, clearcoat:1, clearcoatRoughness:0.1, color:0xffffff });
-  const mesh = new THREE.Mesh(geo, mat); s.add(mesh);
-  
-  const innerGeo = new THREE.IcosahedronGeometry(2, 1);
-  const innerMat = new THREE.MeshStandardMaterial({color:0x00ffe0, wireframe:true});
-  const innerMesh = new THREE.Mesh(innerGeo, innerMat); mesh.add(innerMesh);
+  /**
+   * OMEGA.02 // QUANTUM CORPORATION
+   * RECONSTRUCTION: GOD MODE ACTIVE
+   */
 
-  const l1 = new THREE.PointLight(0xffffff, 2, 50); l1.position.set(10,10,10); s.add(l1);
-  const l2 = new THREE.PointLight(0x00ffe0, 3, 50); l2.position.set(-10,-10,10); s.add(l2);
-  const l3 = new THREE.AmbientLight(0xffffff, 0.5); s.add(l3);
+  // ─── THREE.JS ENGINE ───
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x05060f, 0.04);
 
-  let mx=0, my=0; window.addEventListener('mousemove', e => { mx=(e.clientX/innerWidth-0.5)*2; my=-(e.clientY/innerHeight-0.5)*2; });
-  window.addEventListener('resize', () => { c.aspect=innerWidth/innerHeight; c.updateProjectionMatrix(); r.setSize(innerWidth,innerHeight); });
+  const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+  camera.position.z = 18;
 
-  gsap.from('.title', {y:50, opacity:0, duration:1.5, ease:'power3.out', delay:0.2});
-  gsap.from('.btn', {y:20, opacity:0, duration:1, ease:'power3.out', delay:0.6});
+  const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true, alpha: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.2;
 
-  function anim(t) {
-    requestAnimationFrame(anim);
-    mesh.rotation.y = t * 0.0002; mesh.rotation.x = t * 0.0001;
-    innerMesh.rotation.y = -t * 0.0005;
-    c.position.x += (mx*5 - c.position.x)*0.05; c.position.y += (my*5 - c.position.y)*0.05; c.lookAt(0,0,0);
-    r.render(s, c);
-  } anim(0);
+  // ─── MATERIALS (FIXED PROPERTIES) ───
+  // Use MeshPhysicalMaterial for real glass behavior
+  const quantumMat = new THREE.MeshPhysicalMaterial({
+    color: 0xffffff,
+    metalness: 0.05,
+    roughness: 0.02,
+    transmission: 1, // Real transparency
+    thickness: 2.0, // This IS a valid property in r128+ for physical volume
+    ior: 1.5,
+    reflectivity: 0.5,
+    clearcoat: 1.0,
+    clearcoatRoughness: 0.05,
+    transparent: true,
+    opacity: 0.8
+  });
+
+  const coreMat = new THREE.MeshBasicMaterial({
+    color: 0x00ffe0,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.2
+  });
+
+  // ─── GEOMETRIES ───
+  const crystalGeo = new THREE.IcosahedronGeometry(4.5, 3);
+  const crystal = new THREE.Mesh(crystalGeo, quantumMat);
+  scene.add(crystal);
+
+  const coreGeo = new THREE.IcosahedronGeometry(2.5, 1);
+  const core = new THREE.Mesh(coreGeo, coreMat);
+  crystal.add(core);
+
+  // Floating Data Spheres
+  const pCount = 50;
+  const pGroup = new THREE.Group();
+  scene.add(pGroup);
+  for(let i=0; i<pCount; i++) {
+    const g = new THREE.SphereGeometry(0.05, 8, 8);
+    const m = new THREE.MeshBasicMaterial({color: 0x00ffe0, transparent:true, opacity: 0.3});
+    const p = new THREE.Mesh(g, m);
+    p.position.set((Math.random()-0.5)*20, (Math.random()-0.5)*20, (Math.random()-0.5)*20);
+    p.userData.vel = new THREE.Vector3((Math.random()-0.5)*0.01, (Math.random()-0.5)*0.01, (Math.random()-0.5)*0.01);
+    pGroup.add(p);
+  }
+
+  // ─── LIGHTING ───
+  const l1 = new THREE.PointLight(0xffffff, 2, 50); l1.position.set(10, 15, 10); scene.add(l1);
+  const l2 = new THREE.PointLight(0x00ffe0, 4, 50); l2.position.set(-10, -10, 10); scene.add(l2);
+  const l3 = new THREE.AmbientLight(0xffffff, 0.2); scene.add(l3);
+
+  // ─── INTERACTION ───
+  let mx=0, my=0, tx=0, ty=0;
+  window.addEventListener('mousemove', e => {
+    tx = (e.clientX / window.innerWidth - 0.5) * 2;
+    ty = -(e.clientY / window.innerHeight - 0.5) * 2;
+    
+    gsap.to('#cursor', { x: e.clientX, y: e.clientY, duration: 0.1 });
+    gsap.to('#cursor-ring', { x: e.clientX, y: e.clientY, duration: 0.4 });
+  });
+
+  // ─── INTRO ANIMATION ───
+  gsap.to('#main-title', { opacity: 1, y: 0, duration: 2, ease: 'power4.out', delay: 0.5 });
+  gsap.to('#main-sub', { opacity: 1, y: 0, duration: 2, ease: 'power4.out', delay: 0.8 });
+  gsap.from(crystal.scale, { x:0, y:0, z:0, duration: 2.5, ease: 'expo.out' });
+
+  // ─── RENDER LOOP ───
+  const clock = new THREE.Clock();
+  function animate() {
+    requestAnimationFrame(animate);
+    const t = clock.getElapsedTime();
+    
+    mx += (tx - mx) * 0.05;
+    my += (ty - my) * 0.05;
+
+    crystal.rotation.y = t * 0.15;
+    crystal.rotation.z = Math.sin(t*0.5) * 0.1;
+    core.rotation.y = -t * 0.3;
+    
+    // Vertex pulse
+    const pos = crystal.geometry.attributes.position;
+    for(let i=0; i<pos.count; i++) {
+      const v = new THREE.Vector3().fromBufferAttribute(pos, i);
+      const l = v.length();
+      v.normalize().multiplyScalar(4.5 + Math.sin(t + l*0.5)*0.1);
+      pos.setXYZ(i, v.x, v.y, v.z);
+    }
+    pos.needsUpdate = true;
+
+    // Move particles
+    pGroup.children.forEach(p => {
+      p.position.add(p.userData.vel);
+      if(p.position.length() > 15) p.position.setLength(14.9);
+    });
+
+    camera.position.x = mx * 3;
+    camera.position.y = my * 3;
+    camera.lookAt(0,0,0);
+
+    // UI Updates
+    document.getElementById('clock').innerText = new Date().toLocaleTimeString();
+    document.getElementById('val-2').innerText = (0.3 + Math.random()*0.2).toFixed(2) + 'ms';
+
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  // Click interaction (Scale pulse)
+  window.addEventListener('mousedown', () => {
+    gsap.to(crystal.scale, { x: 1.1, y: 1.1, z: 1.1, duration: 0.2, yoyo: true, repeat: 1 });
+    gsap.to('#cursor-ring', { width: 80, height: 80, borderColor: '#fff', duration: 0.2, yoyo: true, repeat: 1 });
+  });
+
 </script>
 </body>
 </html>
