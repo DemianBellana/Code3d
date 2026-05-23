@@ -1,24 +1,160 @@
-<!DOCTYPE html>\n<html lang='es'>\n<head>\n<meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'>\n<title>undefined // CONSCIOUS AI OS</title>\n<link href='https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&family=DM+Mono:wght@300;400&display=swap' rel='stylesheet'>\n<style>\n:root { --c: #00ff41; --bg: #03040a; }\n* { margin:0; padding:0; box-sizing:border-box; }\nhtml, body { width: 100%; height: 100%; background:var(--bg); color:#fff; font-family:'Rajdhani', sans-serif; overflow:hidden; cursor:none; }\ncanvas { position:fixed; inset:0; z-index:0; }\n#wipe { position:fixed; inset:0; background:var(--bg); z-index:9999; transform-origin:right; transform:scaleX(1); display:flex; align-items:center; justify-content:center; }\n#wipe::after { content:''; position:absolute; width:100%; height:1px; background:var(--c); box-shadow:0 0 20px var(--c); transform:scaleX(0); animation:scan 1.5s ease-in-out forwards; }\n@keyframes scan { 0%{transform:scaleX(0);} 50%{transform:scaleX(1);} 100%{transform:scaleX(0); opacity:0;} }\n#cur { position: fixed; width: 6px; height: 6px; background: #fff; border-radius: 50%; pointer-events: none; z-index: 10000; transform: translate(-50%,-50%); mix-blend-mode: difference; }\n#cur-ring { position: fixed; width: 40px; height: 40px; border: 1px solid var(--c); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width 0.3s, height 0.3s; opacity:0.6; }\n.vignette { position:fixed; inset:0; background:radial-gradient(circle at 50% 50%, transparent 20%, #000 150%); z-index:2; pointer-events:none; }\n.scanlines { position:fixed; inset:0; background:linear-gradient(to bottom, transparent 50%, rgba(255,255,255,0.02) 50%); background-size:100% 4px; z-index:3; pointer-events:none; }\n.noise { position: fixed; inset: 0; z-index: 4; pointer-events: none; opacity: 0.03; background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="n"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23n)"/%3E%3C/svg%3E'); }\n#hud { position:fixed; inset:0; z-index:10; pointer-events:none; padding:4vw; display:flex; flex-direction:column; justify-content:space-between; }\n.tag { font-family:'DM Mono', monospace; font-size:9px; letter-spacing:6px; color:var(--c); text-transform:uppercase; opacity:0.7; }\n.content { position:absolute; top:50%; right:4vw; transform:translateY(-50%); width:300px; border-left:1px solid var(--c); padding-left:20px; background:rgba(0,0,0,0.4); backdrop-filter:blur(10px); }\n.title { font-family:'Orbitron', sans-serif; font-size:1.5rem; font-weight:700; letter-spacing:2px; margin-bottom:20px; color:var(--c); }\n.stat { margin-bottom:15px; font-family:'DM Mono', monospace; font-size:10px; color:rgba(255,255,255,0.5); letter-spacing:2px; display:flex; justify-content:space-between; }\n.stat span { color:#fff; }\n.btn-next { pointer-events:all; align-self:flex-end; padding:15px 30px; border:1px solid rgba(255,255,255,0.1); color:#fff; text-decoration:none; font-family:'Orbitron', sans-serif; font-size:9px; letter-spacing:4px; transition:all 0.4s; backdrop-filter:blur(20px); text-transform:uppercase; background:rgba(255,255,255,0.02); }\n.btn-next:hover { background:var(--c); color:#000; box-shadow:0 0 30px var(--c); border-color:var(--c); padding-right:45px; }\n.emotion { position:absolute; bottom:4vw; left:4vw; font-family:'DM Mono', monospace; font-size:9px; letter-spacing:10px; color:var(--c); opacity:0.3; text-transform:uppercase; }\n@media(max-width:768px) { #hud { padding:2rem; } .content { left:2rem; } .btn-next { align-self:center; width:100%; text-align:center; position:absolute; bottom:2rem; left:50%; transform:translateX(-50%); width:calc(100% - 4rem); } .emotion { display:none; } }\n</style>\n</head>\n<body>\n<div id='wipe'></div><div class='vignette'></div><div class='scanlines'></div><div class='noise'></div>\n<div id='cur'></div><div id='cur-ring'></div>\n<canvas id='c'></canvas>\n<div id='hud'>\n  <div class='tag'>// OMEGA_SYS.04</div>\n  <div class='content'>\n    <h1 class='title'>TELEMETRY</h1>\n    <div class='stat'>STATUS <span>OPTIMAL</span></div>\n    <div class='stat'>LATENCY <span>0.4ms</span></div>\n    <div class='stat'>NODES <span>SYNCED</span></div>\n  </div>\n  <div class='emotion'>Inteligencia emergente</div>\n  <a href='page-04.html' class='btn-next' id='nextBtn'>DEEPER</a>\n</div>\n<script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js'></script>\n<script src='https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js'></script>\n<script type='x-shader/x-vertex' id='p-vert'>
-    attribute float size; attribute float phase; varying float vAlpha; uniform float uTime;
-    void main() {
-      vec3 pos = position; float dist = length(pos);
-      float wave = sin(dist * 0.2 - uTime + phase) * 0.5 + 0.5;
-      pos += normalize(pos) * wave * 2.0;
-      vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-      gl_PointSize = size * (300.0 / -mvPosition.z) * (0.5 + wave * 0.5);
-      gl_Position = projectionMatrix * mvPosition;
-      vAlpha = smoothstep(80.0, 10.0, dist) * (0.2 + wave * 0.4);
-    }
-  </script>\n<script type='x-shader/x-fragment' id='p-frag'>
-    varying float vAlpha; uniform vec3 uColor;
-    void main() {
-      float d = length(gl_PointCoord - 0.5); if (d > 0.5) discard;
-      gl_FragColor = vec4(uColor, vAlpha * (1.0 - d * 2.0));
-    }
-  </script>\n<script>\n  gsap.to('#wipe', {scaleX: 0, duration: 1.5, ease: 'expo.inOut', delay: 0.2});\n  document.getElementById('nextBtn').addEventListener('click', e => {\n    e.preventDefault();\n    gsap.to('#wipe', {scaleX: 1, duration: 1.2, ease: 'expo.inOut', transformOrigin: 'left', onComplete: () => window.location.href = e.currentTarget.href});\n  });\n  let mx=0, my=0, cx=0, cy=0;\n  const cur = document.getElementById('cur'), ring = document.getElementById('cur-ring');\n  function updatePointer(x, y) { mx = (x / innerWidth - 0.5) * 2; my = -(y / innerHeight - 0.5) * 2; gsap.to(cur, {x: x, y: y, duration: 0.1}); gsap.to(ring, {x: x, y: y, duration: 0.4}); }\n  window.addEventListener('mousemove', e => updatePointer(e.clientX, e.clientY));\n  window.addEventListener('touchmove', e => updatePointer(e.touches[0].clientX, e.touches[0].clientY));\n  document.querySelectorAll('a').forEach(el => { el.addEventListener('mouseenter', () => gsap.to(ring, {width:60, height:60, borderColor:'#fff'})); el.addEventListener('mouseleave', () => gsap.to(ring, {width:40, height:40, borderColor:'var(--c)'})); });\n  const s = new THREE.Scene(); s.fog = new THREE.FogExp2(0x03040a, 0.04);\n  const c = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 0.1, 1000); c.position.z = 25;\n  const r = new THREE.WebGLRenderer({canvas:document.getElementById('c'), antialias:true, alpha:true});\n  r.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); r.setSize(innerWidth, innerHeight); r.toneMapping = THREE.ACESFilmicToneMapping;\n  const pCount = 12000; const pPos = new Float32Array(pCount*3); const pSiz = new Float32Array(pCount); const pPhs = new Float32Array(pCount);\n  for(let i=0;i<pCount;i++){ pPos[i*3]=(Math.random()-0.5)*150; pPos[i*3+1]=(Math.random()-0.5)*150; pPos[i*3+2]=(Math.random()-0.5)*150; pSiz[i]=Math.random()*1.5; pPhs[i]=Math.random()*Math.PI*2; }\n  const pGeo = new THREE.BufferGeometry(); pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3)); pGeo.setAttribute('size', new THREE.BufferAttribute(pSiz, 1)); pGeo.setAttribute('phase', new THREE.BufferAttribute(pPhs, 1));\n  const pMat = new THREE.ShaderMaterial({ uniforms: { uTime: {value:0}, uColor: {value: new THREE.Color(0x00ff41)} }, vertexShader: document.getElementById('p-vert').textContent, fragmentShader: document.getElementById('p-frag').textContent, transparent:true, blending:THREE.AdditiveBlending, depthWrite:false });\n  const particles = new THREE.Points(pGeo, pMat); s.add(particles);\n  const l1 = new THREE.PointLight(0x00ff41, 2, 100); l1.position.set(10,15,10); s.add(l1);\n  const l2 = new THREE.PointLight(0xffffff, 1, 100); l2.position.set(-10,-15,10); s.add(l2);\n  s.add(new THREE.AmbientLight(0xffffff, 0.1));\n  let centralObj, centralObj2;\n  centralObj = new THREE.Group(); for(let i=0;i<8;i++){ const r=new THREE.Mesh(new THREE.TorusGeometry(3+i*1.5, 0.02, 16, 100), new THREE.MeshBasicMaterial({color:0x00ff41, wireframe:true, transparent:true, opacity:0.4})); r.rotation.x = Math.random()*Math.PI; r.userData.rs = (Math.random()-0.5)*0.5; centralObj.add(r); }\n  if(centralObj) s.add(centralObj); if(centralObj2) s.add(centralObj2);\n  const clock = new THREE.Clock();\n  function anim() { requestAnimationFrame(anim); const t = clock.getElapsedTime();\n    pMat.uniforms.uTime.value = t; particles.rotation.y = t * 0.02;\n    if(centralObj){ centralObj.rotation.y = t*0.1; } if(centralObj2){ centralObj2.rotation.y = -t*0.2; }
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>SYSTEM // CONSCIOUS AI OS</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root { --c: #00ff41; --bg: #03040a; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width: 100%; height: 100%; background:var(--bg); color:#fff; font-family:'Rajdhani', sans-serif; overflow:hidden; cursor:none; }
+  canvas { position:fixed; inset:0; z-index:0; }
+  
+  #wipe { position:fixed; inset:0; background:var(--bg); z-index:9999; transform-origin:right; transform:scaleX(1); display:flex; align-items:center; justify-content:center; }
+  #wipe::after { content:''; position:absolute; width:100%; height:1px; background:var(--c); box-shadow:0 0 20px var(--c); transform:scaleX(0); animation:scan 1.5s ease-in-out forwards; }
+  @keyframes scan { 0%{transform:scaleX(0);} 50%{transform:scaleX(1);} 100%{transform:scaleX(0); opacity:0;} }
 
-      centralObj.children.forEach((r, i) => {
-        r.rotation.z += r.userData.rs;
-        r.scale.setScalar(1 + Math.sin(t + i)*0.05);
-      });
-    \n    c.position.x += (mx * 8 - c.position.x) * 0.05; c.position.y += (my * 8 - c.position.y) * 0.05; c.lookAt(0,0,0);\n    r.render(s, c);\n  } anim();\n  window.addEventListener('resize', () => { c.aspect=innerWidth/innerHeight; c.updateProjectionMatrix(); r.setSize(innerWidth,innerHeight); });\n</script>\n</body>\n</html>
+  #cur { position: fixed; width: 6px; height: 6px; background: #fff; border-radius: 50%; pointer-events: none; z-index: 10000; transform: translate(-50%,-50%); mix-blend-mode: difference; }
+  #cur-ring { position: fixed; width: 40px; height: 40px; border: 1px solid var(--c); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width 0.3s, height 0.3s; opacity:0.6; }
+  
+  .vignette { position:fixed; inset:0; background:radial-gradient(circle at 50% 50%, transparent 20%, #000 150%); z-index:2; pointer-events:none; }
+  .scanlines { position:fixed; inset:0; background:linear-gradient(to bottom, transparent 50%, rgba(255,255,255,0.02) 50%); background-size:100% 4px; z-index:3; pointer-events:none; }
+  .noise { position: fixed; inset: 0; z-index: 4; pointer-events: none; opacity: 0.03; background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="n"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%" height="100%" filter="url(%23n)"/%3E%3C/svg%3E'); }
+
+  #hud { position:fixed; inset:0; z-index:10; pointer-events:none; padding:4vw; display:flex; flex-direction:column; justify-content:space-between; }
+  .tag { font-family:'DM Mono', monospace; font-size:9px; letter-spacing:6px; color:var(--c); text-transform:uppercase; opacity:0.7; }
+  
+  
+  .content { position:absolute; top:50%; right:4vw; transform:translateY(-50%); width:320px; border-left:1px solid var(--c); padding-left:20px; background:rgba(0,0,0,0.6); backdrop-filter:blur(20px); }
+  .title { font-family:'Orbitron', sans-serif; font-size:1.5rem; font-weight:700; letter-spacing:2px; margin-bottom:20px; color:var(--c); }
+  .stat { margin-bottom:15px; font-family:'DM Mono', monospace; font-size:10px; color:rgba(255,255,255,0.5); letter-spacing:2px; display:flex; justify-content:space-between; }
+  .stat span { color:#fff; }
+  .honk-pipeline { margin-top:30px; border-top:1px solid rgba(255,255,255,0.1); padding-top:20px; }
+  .hp-title { font-family:'DM Mono'; font-size:9px; color:var(--c); letter-spacing:4px; margin-bottom:15px; }
+  .hp-step { font-family:'DM Mono'; font-size:8px; color:rgba(255,255,255,0.3); margin-bottom:8px; display:flex; align-items:center; gap:10px; }
+  .hp-step.active { color:#fff; text-shadow:0 0 10px var(--c); }
+  .hp-dot { width:4px; height:4px; border-radius:50%; background:currentColor; }
+  
+
+  .btn-next { pointer-events:all; align-self:flex-end; padding:15px 30px; border:1px solid rgba(255,255,255,0.1); color:#fff; text-decoration:none; font-family:'Orbitron', sans-serif; font-size:9px; letter-spacing:4px; transition:all 0.4s; backdrop-filter:blur(20px); text-transform:uppercase; background:rgba(255,255,255,0.02); }
+  .btn-next:hover { background:var(--c); color:#000; box-shadow:0 0 30px var(--c); border-color:var(--c); padding-right:45px; }
+  .emotion { position:absolute; bottom:4vw; left:4vw; font-family:'DM Mono', monospace; font-size:9px; letter-spacing:10px; color:var(--c); opacity:0.3; text-transform:uppercase; }
+  
+  @media(max-width:768px) { #hud { padding:2rem; } .content { left:2rem; } .btn-next { align-self:center; width:100%; text-align:center; position:absolute; bottom:2rem; left:50%; transform:translateX(-50%); width:calc(100% - 4rem); } .emotion { display:none; } }
+</style>
+</head>
+<body>
+<div id="wipe"></div><div class="vignette"></div><div class="scanlines"></div><div class="noise"></div>
+<div id="cur"></div><div id="cur-ring"></div>
+<canvas id="c"></canvas>
+
+<div id="hud">
+  <div class="tag">// OMEGA_SYS.04</div>
+  <div class="content">
+    
+    <h1 class="title">TELEMETRY</h1>
+    <div class="stat">STATUS <span>OPTIMAL</span></div>
+    <div class="stat">LATENCY <span>0.4ms</span></div>
+    <div class="stat">NODES <span>SYNCED</span></div>
+    <div class="honk-pipeline">
+      <div class="hp-title">SDD_PIPELINE // HONKFLOW</div>
+      <div class="hp-step"><div class="hp-dot"></div> EXPLORE</div>
+      <div class="hp-step"><div class="hp-dot"></div> PROPOSE</div>
+      <div class="hp-step"><div class="hp-dot"></div> SPEC</div>
+      <div class="hp-step"><div class="hp-dot"></div> DESIGN</div>
+      <div class="hp-step active"><div class="hp-dot"></div> APPLY</div>
+      <div class="hp-step"><div class="hp-dot"></div> VERIFY</div>
+      <div class="hp-step"><div class="hp-dot"></div> ARCHIVE</div>
+    </div>
+    
+  </div>
+  <div class="emotion">Inteligencia emergente</div>
+  <a href="page-04.html" class="btn-next" id="nextBtn">DEEPER</a>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+<script type="x-shader/x-vertex" id="p-vert">
+  attribute float size; attribute float phase; varying float vAlpha; uniform float uTime;
+  void main() {
+    vec3 pos = position; float dist = length(pos);
+    float wave = sin(dist * 0.2 - uTime + phase) * 0.5 + 0.5;
+    pos += normalize(pos) * wave * 2.0;
+    vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+    gl_PointSize = size * (300.0 / -mvPosition.z) * (0.5 + wave * 0.5);
+    gl_Position = projectionMatrix * mvPosition;
+    vAlpha = smoothstep(80.0, 10.0, dist) * (0.2 + wave * 0.4);
+  }
+</script>
+<script type="x-shader/x-fragment" id="p-frag">
+  varying float vAlpha; uniform vec3 uColor;
+  void main() {
+    float d = length(gl_PointCoord - 0.5); if (d > 0.5) discard;
+    gl_FragColor = vec4(uColor, vAlpha * (1.0 - d * 2.0));
+  }
+</script>
+
+<script>
+  gsap.to('#wipe', {scaleX: 0, duration: 1.5, ease: 'expo.inOut', delay: 0.2});
+  document.getElementById('nextBtn').addEventListener('click', e => {
+    e.preventDefault();
+    gsap.to('#wipe', {scaleX: 1, duration: 1.2, ease: 'expo.inOut', transformOrigin: 'left', onComplete: () => window.location.href = e.currentTarget.href});
+  });
+
+  let mx=0, my=0;
+  const cur = document.getElementById('cur'), ring = document.getElementById('cur-ring');
+  function updatePointer(x, y) { 
+    mx = (x / innerWidth - 0.5) * 2; my = -(y / innerHeight - 0.5) * 2; 
+    gsap.to(cur, {x: x, y: y, duration: 0.1});
+    gsap.to(ring, {x: x, y: y, duration: 0.4}); 
+  }
+  window.addEventListener('mousemove', e => updatePointer(e.clientX, e.clientY));
+  window.addEventListener('touchmove', e => updatePointer(e.touches[0].clientX, e.touches[0].clientY));
+  document.querySelectorAll('a').forEach(el => { 
+    el.addEventListener('mouseenter', () => gsap.to(ring, {width:60, height:60, borderColor:'#fff'})); 
+    el.addEventListener('mouseleave', () => gsap.to(ring, {width:40, height:40, borderColor:'var(--c)'})); 
+  });
+
+  const s = new THREE.Scene(); s.fog = new THREE.FogExp2(0x03040a, 0.04);
+  const c = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 0.1, 1000); 
+  c.position.z = 25;
+  const r = new THREE.WebGLRenderer({canvas:document.getElementById('c'), antialias:true, alpha:true});
+  r.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); r.setSize(innerWidth, innerHeight); r.toneMapping = THREE.ACESFilmicToneMapping;
+
+  const pCount = 12000; const pPos = new Float32Array(pCount*3); const pSiz = new Float32Array(pCount); const pPhs = new Float32Array(pCount);
+  for(let i=0;i<pCount;i++){ pPos[i*3]=(Math.random()-0.5)*150; pPos[i*3+1]=(Math.random()-0.5)*150; pPos[i*3+2]=(Math.random()-0.5)*150; pSiz[i]=Math.random()*1.5; pPhs[i]=Math.random()*Math.PI*2; }
+  const pGeo = new THREE.BufferGeometry(); pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3)); pGeo.setAttribute('size', new THREE.BufferAttribute(pSiz, 1)); pGeo.setAttribute('phase', new THREE.BufferAttribute(pPhs, 1));
+  const pMat = new THREE.ShaderMaterial({ uniforms: { uTime: {value:0}, uColor: {value: new THREE.Color(0x00ff41)} }, vertexShader: document.getElementById('p-vert').textContent, fragmentShader: document.getElementById('p-frag').textContent, transparent:true, blending:THREE.AdditiveBlending, depthWrite:false });
+  const particles = new THREE.Points(pGeo, pMat); s.add(particles);
+
+  const l1 = new THREE.PointLight(0x00ff41, 2, 100); l1.position.set(10,15,10); s.add(l1);
+  const l2 = new THREE.PointLight(0xffffff, 1, 100); l2.position.set(-10,-15,10); s.add(l2);
+  s.add(new THREE.AmbientLight(0xffffff, 0.1));
+
+  let centralObj, centralObj2;
+  centralObj = new THREE.Group(); for(let i=0;i<8;i++){ const r=new THREE.Mesh(new THREE.TorusGeometry(3+i*1.5, 0.02, 16, 100), new THREE.MeshBasicMaterial({color:0x00ff41, wireframe:true, transparent:true, opacity:0.4})); r.rotation.x = Math.random()*Math.PI; r.userData.rs = (Math.random()-0.5)*0.5; centralObj.add(r); }
+  if(centralObj) s.add(centralObj); if(centralObj2) s.add(centralObj2);
+
+  const clock = new THREE.Clock();
+  function anim() { 
+    requestAnimationFrame(anim); const t = clock.getElapsedTime();
+    pMat.uniforms.uTime.value = t; particles.rotation.y = t * 0.02;
+    if(centralObj){ centralObj.rotation.y = t*0.1; } if(centralObj2){ centralObj2.rotation.y = -t*0.2; }
+
+      if(centralObj) {
+        centralObj.children.forEach((r, i) => {
+          r.rotation.z += r.userData.rs || 0.01;
+          r.scale.setScalar(1 + Math.sin(t + i)*0.05);
+        });
+      }
+    
+    c.position.x += (mx * 8 - c.position.x) * 0.05; c.position.y += (my * 8 - c.position.y) * 0.05; c.lookAt(0,0,0);
+    r.render(s, c);
+  } 
+  anim();
+
+  window.addEventListener('resize', () => { c.aspect=innerWidth/innerHeight; c.updateProjectionMatrix(); r.setSize(innerWidth,innerHeight); });
+</script>
+</body>
+</html>
