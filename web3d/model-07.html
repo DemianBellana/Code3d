@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MODEL UNDER CONSTRUCTION // OMEGA.SYS</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root { --c: #00f0ff; --bg: #03040a; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { 
+    background: var(--bg); color: #fff; overflow: hidden; 
+    font-family: 'Rajdhani', sans-serif; height: 100vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: crosshair;
+  }
+  #bg { position: fixed; inset: 0; z-index: -1; opacity: 0.3; }
+  .loader-box { text-align: center; z-index: 10; animation: fadeIn 2s ease; }
+  .eyebrow { font-family: 'Orbitron', sans-serif; font-size: 0.7rem; letter-spacing: 0.5em; color: var(--c); margin-bottom: 2rem; opacity: 0.6; }
+  .title { font-family: 'Orbitron', sans-serif; font-size: clamp(2rem, 6vw, 4rem); font-weight: 900; letter-spacing: -1px; margin-bottom: 1rem; text-shadow: 0 0 30px var(--c); }
+  .status { font-family: 'Orbitron', sans-serif; font-size: 0.8rem; letter-spacing: 0.2em; margin-bottom: 3rem; color: rgba(255,255,255,0.4); }
+  .status span { animation: blink 1s infinite; }
+  
+  .btn-back {
+    text-decoration: none; color: #000; background: var(--c);
+    font-family: 'Orbitron', sans-serif; font-size: 0.7rem; font-weight: 700;
+    padding: 1.2rem 2.5rem; border-radius: 4px; letter-spacing: 0.3em;
+    box-shadow: 0 0 40px rgba(0,240,255,0.3); transition: all 0.4s;
+  }
+  .btn-back:hover { transform: scale(1.05); box-shadow: 0 0 60px rgba(0,240,255,0.5); }
+
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  
+  canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+</style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  <div class="loader-box">
+    <div class="eyebrow">OMEGA_SYSTEM // PROTOCOL_01</div>
+    <h1 class="title">MODEL_UNDER_CONSTRUCTION</h1>
+    <div class="status">COMPILING DIMENSIONS<span>...</span></div>
+    <a href="../web3d.html" class="btn-back">VOLVER AL HUB</a>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    let w, h;
+    function resize() {
+      w = canvas.width = window.innerWidth;
+      h = canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    const particles = [];
+    for(let i=0; i<100; i++) {
+      particles.push({
+        x: Math.random() * w, y: Math.random() * h,
+        vx: (Math.random()-0.5) * 0.5, vy: (Math.random()-0.5) * 0.5,
+        size: Math.random() * 2
+      });
+    }
+
+    function animate() {
+      ctx.fillStyle = 'rgba(3, 4, 10, 0.1)';
+      ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = '#00f0ff';
+      particles.forEach(p => {
+        p.x += p.vx; p.y += p.vy;
+        if(p.x < 0 || p.x > w) p.vx *= -1;
+        if(p.y < 0 || p.y > h) p.vy *= -1;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI*2);
+        ctx.fill();
+      });
+      requestAnimationFrame(animate);
+    }
+    animate();
+  </script>
+</body>
+</html>
