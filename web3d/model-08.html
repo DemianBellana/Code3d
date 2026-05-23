@@ -3,78 +3,50 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>FUTURE CITY // OMEGA.08</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  body { margin:0; padding:0; background:#050000; color:#ff0055; font-family:'Rajdhani', sans-serif; overflow:hidden; }
-  canvas { position:fixed; inset:0; z-index:0; }
-  #hud { position:absolute; inset:0; pointer-events:none; z-index:10; padding:2rem; }
-  .panel { position:absolute; bottom:0; left:0; width:40vw; min-width:300px; padding:3rem 2rem; background:rgba(20,0,5,0.8); backdrop-filter:blur(10px); clip-path:polygon(0 0, 85% 0, 100% 100%, 0 100%); border-top:2px solid #ff0055; pointer-events:all; }
-  .title { font-family:'Orbitron', sans-serif; font-size:2.5rem; margin-bottom:0.5rem; text-shadow:0 0 15px #ff0055; }
-  .desc { font-size:1rem; color:rgba(255,255,255,0.6); margin-bottom:2rem; }
-  .btn { display:inline-block; padding:1rem 2rem; background:#ff0055; color:#000; text-decoration:none; font-weight:700; text-transform:uppercase; letter-spacing:0.2em; border-radius:2px; box-shadow:0 0 20px rgba(255,0,85,0.4); transition:all 0.3s; }
-  .btn:hover { background:#fff; box-shadow:0 0 30px #fff; }
-  .crosshair { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:40px; height:40px; pointer-events:none; }
-  .crosshair::before, .crosshair::after { content:''; position:absolute; background:#ff0055; }
-  .crosshair::before { top:19px; left:0; width:40px; height:2px; } .crosshair::after { left:19px; top:0; width:2px; height:40px; }
-  @media(max-width:768px){ .panel{width:100%; clip-path:none; border-top:2px solid #ff0055;} .title{font-size:2rem;} }
+  body { margin:0; overflow:hidden; background:#000; cursor:none; font-family:sans-serif; }
+  canvas { display:block; }
+  #hud { position:fixed; inset:0; pointer-events:none; z-index:10; box-shadow:inset 0 0 100px rgba(255,0,0,0.5); }
+  .btn { position:absolute; top:20px; left:20px; padding:10px 20px; background:rgba(255,0,0,0.3); border:1px solid #f00; color:#f00; text-decoration:none; font-weight:bold; letter-spacing:2px; pointer-events:all; transition:0.3s; }
+  .btn:hover { background:#f00; color:#000; box-shadow:0 0 20px #f00; }
+  .target { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:50px; height:50px; border:2px solid #f00; border-radius:50%; pointer-events:none; }
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
-<div class="crosshair"></div>
-<div id="hud">
-  <div class="panel">
-    <div class="title">SECTOR_7G</div>
-    <div class="desc">Metrópolis instanciada. Procesamiento masivo de geometrías urbanas bajo lluvia de datos.</div>
-    <a href="../web3d.html" class="btn">EVACUAR SECTOR</a>
-  </div>
-</div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script>
-  const s = new THREE.Scene(); s.fog = new THREE.FogExp2(0x050000, 0.02);
-  const c = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 500); c.position.set(0, 15, 40);
-  const r = new THREE.WebGLRenderer({canvas:document.getElementById('c'), antialias:true});
-  r.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); r.setSize(innerWidth, innerHeight);
-
-  // Instanced City
-  const count = 1000;
-  const geo = new THREE.BoxGeometry(2, 1, 2);
-  const mat = new THREE.MeshStandardMaterial({color:0x222222, roughness:0.8, metalness:0.2});
-  const imesh = new THREE.InstancedMesh(geo, mat, count);
+<div id="hud"><a href="../web3d.html" class="btn">EVACUATE</a><div class="target"></div></div>
+<script type="module">
+  import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+  const renderer = new THREE.WebGLRenderer({canvas:document.getElementById('c')});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); renderer.setSize(innerWidth, innerHeight);
+  const scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(0x0a0000, 0.05);
+  const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 100); camera.position.set(0, 10, 20);
+  
+  // City
+  const geo = new THREE.BoxGeometry(1, 1, 1);
+  const mat = new THREE.MeshBasicMaterial({color:0x220000, wireframe:true});
+  const imesh = new THREE.InstancedMesh(geo, mat, 500);
   const dummy = new THREE.Object3D();
-  for(let i=0; i<count; i++){
-    const h = 2 + Math.random()*20;
-    dummy.position.set((Math.random()-0.5)*200, h/2, (Math.random()-0.5)*200);
-    dummy.scale.set(1, h, 1); dummy.updateMatrix();
+  for(let i=0; i<500; i++){
+    const h = 2 + Math.random()*15;
+    dummy.position.set((Math.random()-0.5)*100, h/2 - 5, (Math.random()-0.5)*100);
+    dummy.scale.set(1.5, h, 1.5); dummy.updateMatrix();
     imesh.setMatrixAt(i, dummy.matrix);
   }
-  s.add(imesh);
+  scene.add(imesh);
 
-  // Neon Lights
-  const l1 = new THREE.PointLight(0xff0055, 5, 100); l1.position.set(0,20,0); s.add(l1);
-  const l2 = new THREE.PointLight(0x00aaff, 3, 100); l2.position.set(20,10,-20); s.add(l2);
-  const l3 = new THREE.AmbientLight(0x110000); s.add(l3);
+  let mx=0, my=0; window.addEventListener('mousemove', e=>{ mx=e.clientX/innerWidth-0.5; my=-(e.clientY/innerHeight-0.5); });
+  window.addEventListener('resize', ()=>{ camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); });
 
-  // Hovering cars (particles)
-  const pc=200; const pg=new THREE.BufferGeometry(); const pa=new Float32Array(pc*3);
-  for(let i=0;i<pc;i++){ pa[i*3]=(Math.random()-0.5)*100; pa[i*3+1]=5+Math.random()*15; pa[i*3+2]=(Math.random()-0.5)*100; }
-  pg.setAttribute('position', new THREE.BufferAttribute(pa,3));
-  const pm=new THREE.PointsMaterial({color:0xff0055, size:0.5});
-  const cars = new THREE.Points(pg, pm); s.add(cars);
-
-  let mx=0, my=0; window.addEventListener('mousemove', e => { mx=(e.clientX/innerWidth-0.5)*2; my=-(e.clientY/innerHeight-0.5)*2; });
-  window.addEventListener('resize', () => { c.aspect=innerWidth/innerHeight; c.updateProjectionMatrix(); r.setSize(innerWidth,innerHeight); });
-
-  function anim() {
+  function anim(t){
     requestAnimationFrame(anim);
-    c.position.x += (mx*20 - c.position.x)*0.05; c.position.y += (15 + my*10 - c.position.y)*0.05;
-    c.lookAt(0, 5, -20);
-    // Move cars
-    const pos = pg.attributes.position.array;
-    for(let i=0; i<pc; i++){ pos[i*3+2] -= 0.5; if(pos[i*3+2] < -50) pos[i*3+2] = 50; }
-    pg.attributes.position.needsUpdate = true;
-    r.render(s, c);
-  } anim();
+    camera.position.z -= 0.1; // fly forward
+    if(camera.position.z < -20) camera.position.z = 20;
+    camera.position.x += (mx*10 - camera.position.x)*0.05;
+    camera.position.y += (10 + my*10 - camera.position.y)*0.05;
+    camera.lookAt(0, 5, camera.position.z - 20);
+    renderer.render(scene, camera);
+  } anim(0);
 </script>
 </body>
 </html>

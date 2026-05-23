@@ -3,65 +3,60 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>GOD TIER // OMEGA.10</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap" rel="stylesheet">
 <style>
-  body { margin:0; padding:0; background:#000; overflow:hidden; font-family:'Orbitron', sans-serif; cursor:none; }
-  canvas { position:fixed; inset:0; z-index:0; }
-  #ui { position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:10; pointer-events:none; mix-blend-mode:difference; }
-  .title { font-size:clamp(4rem, 15vw, 12rem); color:#fff; margin:0; line-height:1; letter-spacing:2vw; padding-left:2vw; animation:shake 0.5s infinite alternate; }
-  .sub { font-size:1rem; color:#fff; letter-spacing:1em; margin-top:2rem; text-transform:uppercase; animation:shake 1s infinite alternate-reverse; }
-  .btn { pointer-events:all; margin-top:5rem; padding:1.5rem 4rem; background:#fff; color:#000; text-decoration:none; font-size:1rem; font-weight:900; letter-spacing:0.3em; transition:all 0.2s; mix-blend-mode:normal; }
-  .btn:hover { background:transparent; color:#fff; border:1px solid #fff; box-shadow:0 0 50px #fff; }
-  @keyframes shake { 0%{transform:translate(1px,1px) rotate(0deg);} 100%{transform:translate(-1px,-2px) rotate(-1deg);} }
-  .vignette { position:fixed; inset:0; background:radial-gradient(circle, transparent 40%, #000 120%); pointer-events:none; z-index:5; }
+  body { margin:0; overflow:hidden; background:#000; cursor:none; }
+  canvas { display:block; }
+  #hud { position:fixed; inset:0; pointer-events:none; z-index:10; display:flex; justify-content:center; align-items:center; mix-blend-mode:difference; }
+  h1 { font-family:sans-serif; font-size:15vw; color:#fff; margin:0; line-height:1; letter-spacing:-5px; }
+  .btn { position:absolute; bottom:5vh; padding:15px 40px; border:2px solid #fff; color:#fff; text-decoration:none; font-family:sans-serif; font-size:12px; font-weight:900; letter-spacing:5px; pointer-events:all; transition:0.3s; }
+  .btn:hover { background:#fff; color:#000; }
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
-<div class="vignette"></div>
-<div id="ui">
-  <h1 class="title">GOD</h1>
-  <div class="sub">SINGULARITY REACHED</div>
-  <a href="../web3d.html" class="btn">AWAKEN</a>
-</div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script>
-  const s = new THREE.Scene();
-  const c = new THREE.PerspectiveCamera(90, innerWidth/innerHeight, 0.1, 1000); c.position.z = 10;
-  const r = new THREE.WebGLRenderer({canvas:document.getElementById('c'), antialias:true});
-  r.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); r.setSize(innerWidth, innerHeight);
-
-  // Intense Abstract Geometry
-  const geo = new THREE.TorusKnotGeometry(3, 1, 200, 32);
-  const mat = new THREE.MeshStandardMaterial({color:0xffb800, metalness:1, roughness:0.2, wireframe:true});
-  const mesh = new THREE.Mesh(geo, mat); s.add(mesh);
-
-  const geo2 = new THREE.IcosahedronGeometry(6, 1);
-  const mat2 = new THREE.MeshBasicMaterial({color:0xffffff, wireframe:true, transparent:true, opacity:0.1});
-  const mesh2 = new THREE.Mesh(geo2, mat2); s.add(mesh2);
-
-  const l1 = new THREE.PointLight(0xffffff, 5, 50); l1.position.set(0,0,0); s.add(l1);
-  
-  let mx=0, my=0; window.addEventListener('mousemove', e => { mx=(e.clientX/innerWidth-0.5)*2; my=-(e.clientY/innerHeight-0.5)*2; });
-  window.addEventListener('resize', () => { c.aspect=innerWidth/innerHeight; c.updateProjectionMatrix(); r.setSize(innerWidth,innerHeight); });
-
-  function anim(t) {
+<div id="hud"><h1>OMNIPRESENCE</h1><a href="../web3d.html" class="btn">RETURN TO REALITY</a></div>
+<script type="module">
+  import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+  const renderer = new THREE.WebGLRenderer({canvas:document.getElementById('c'), powerPreference:"high-performance"});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); renderer.setSize(innerWidth, innerHeight);
+  const scene = new THREE.Scene(); const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+  const mat = new THREE.ShaderMaterial({
+    uniforms: { u_time: {value:0}, u_res: {value:new THREE.Vector2(innerWidth, innerHeight)}, u_mouse: {value:new THREE.Vector2(0,0)} },
+    vertexShader: `void main(){ gl_Position = vec4(position, 1.0); }`,
+    fragmentShader: `
+      uniform float u_time; uniform vec2 u_res; uniform vec2 u_mouse;
+      void main(){
+        vec2 uv = (gl_FragCoord.xy - 0.5*u_res.xy)/u_res.y;
+        vec2 m = u_mouse;
+        float t = u_time * 0.5;
+        
+        // Fractal math (Mandelbox logic simplified)
+        vec3 p = vec3(uv * 2.0, t);
+        for(int i=0; i<4; i++){
+          p = abs(p) / dot(p,p) - vec3(0.5);
+        }
+        
+        float intensity = length(p);
+        vec3 col = vec3(sin(intensity*10.0), cos(intensity*12.0), sin(intensity*15.0));
+        col *= exp(-length(uv)*2.0); // Vignette
+        
+        // Extreme aberration on mouse move
+        col.r += sin(intensity*10.0 + m.x*10.0)*0.5;
+        col.b += cos(intensity*15.0 + m.y*10.0)*0.5;
+        
+        gl_FragColor = vec4(abs(col), 1.0);
+      }
+    `
+  });
+  scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2), mat));
+  let mx=0, my=0; window.addEventListener('mousemove', e=>{ mx=e.clientX/innerWidth-0.5; my=-(e.clientY/innerHeight-0.5); });
+  window.addEventListener('resize', ()=>{ renderer.setSize(innerWidth, innerHeight); mat.uniforms.u_res.value.set(innerWidth,innerHeight); });
+  function anim(t){
     requestAnimationFrame(anim);
-    const time = t * 0.005; // Fast erratic
-    mesh.rotation.x = time; mesh.rotation.y = time*1.2;
-    mesh2.rotation.x = -time*0.5; mesh2.rotation.y = -time*0.5;
-    
-    const sFact = 1 + Math.sin(time*5)*0.1; mesh.scale.set(sFact,sFact,sFact);
-    
-    // Erratic camera
-    c.position.x += (mx*2 + Math.sin(time*10)*0.5 - c.position.x)*0.1; 
-    c.position.y += (my*2 + Math.cos(time*12)*0.5 - c.position.y)*0.1;
-    c.lookAt(0,0,0);
-    
-    // Flicker light
-    l1.intensity = 2 + Math.random()*5;
-    
-    r.render(s, c);
+    mat.uniforms.u_time.value = t*0.001;
+    mat.uniforms.u_mouse.value.x += (mx - mat.uniforms.u_mouse.value.x)*0.1;
+    mat.uniforms.u_mouse.value.y += (my - mat.uniforms.u_mouse.value.y)*0.1;
+    renderer.render(scene, camera);
   } anim(0);
 </script>
 </body>

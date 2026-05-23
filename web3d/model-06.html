@@ -3,71 +3,66 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>MATRIX NET // OMEGA.06</title>
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-  body { margin:0; padding:0; background:#000; color:#0f0; font-family:'Share Tech Mono', monospace; overflow:hidden; }
-  canvas { position:fixed; inset:0; z-index:0; }
-  #terminal { position:absolute; top:3rem; left:3rem; z-index:10; pointer-events:none; text-shadow:0 0 5px #0f0; }
-  .line { overflow:hidden; white-space:nowrap; border-right:2px solid #0f0; margin-bottom:0.5rem; font-size:1.2rem; width:0; }
-  .btn { position:absolute; bottom:3rem; left:3rem; z-index:10; pointer-events:all; padding:1rem 2rem; border:1px solid #0f0; color:#0f0; text-decoration:none; background:rgba(0,255,0,0.1); text-transform:uppercase; transition:all 0.2s; box-shadow:0 0 10px rgba(0,255,0,0.2); }
-  .btn:hover { background:#0f0; color:#000; box-shadow:0 0 30px #0f0; }
-  .crt { position:fixed; inset:0; background:linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.25) 50%), linear-gradient(90deg, rgba(255,0,0,0.06), rgba(0,255,0,0.02), rgba(0,0,255,0.06)); background-size:100% 2px, 3px 100%; z-index:9; pointer-events:none; }
-  @media(max-width:768px){ #terminal{top:1.5rem;left:1.5rem;} .btn{bottom:1.5rem;left:1.5rem;width:calc(100% - 3rem);text-align:center;} .line{font-size:0.9rem;} }
+  body { margin:0; overflow:hidden; background:#000; cursor:none; font-family:monospace; }
+  canvas { display:block; }
+  #hud { position:fixed; inset:0; pointer-events:none; z-index:10; color:#0f0; padding:20px; text-shadow:0 0 5px #0f0; }
+  .btn { position:absolute; bottom:20px; right:20px; padding:10px 20px; border:1px solid #0f0; color:#0f0; text-decoration:none; pointer-events:all; transition:0.2s; background:rgba(0,255,0,0.1); }
+  .btn:hover { background:#0f0; color:#000; box-shadow:0 0 20px #0f0; }
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
-<div class="crt"></div>
-<div id="terminal">
-  <div class="line" id="l1">> WAKE UP, USER.</div>
-  <div class="line" id="l2">> THE MATRIX HAS YOU.</div>
-  <div class="line" id="l3">> SYSTEM OVERRIDE INITIATED.</div>
+<div id="hud">
+  <div>> ROOT ACCESS GRANTED</div>
+  <div id="hex"></div>
+  <a href="../web3d.html" class="btn">JACK OUT</a>
 </div>
-<a href="../web3d.html" class="btn">ESC: DISCONNECT</a>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-<script>
-  // Terminal typing effect
-  gsap.to('#l1', {width:'100%', duration:1.5, ease:'steps(20)', onComplete:()=>{ gsap.set('#l1',{borderRight:'none'}); gsap.to('#l2', {width:'100%', duration:1.5, ease:'steps(20)', onComplete:()=>{ gsap.set('#l2',{borderRight:'none'}); gsap.to('#l3', {width:'100%', duration:2, ease:'steps(30)'}); }}); }});
-
-  const s = new THREE.Scene(); s.fog = new THREE.FogExp2(0x000000, 0.03);
-  const c = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 200); c.position.set(0, 5, 20);
-  const r = new THREE.WebGLRenderer({canvas:document.getElementById('c'), antialias:true});
-  r.setSize(innerWidth, innerHeight);
-
-  // Wireframe Terrain
-  const geo = new THREE.PlaneGeometry(200, 200, 60, 60); geo.rotateX(-Math.PI/2);
-  const mat = new THREE.MeshBasicMaterial({color:0x00ff00, wireframe:true, transparent:true, opacity:0.3});
-  const terrain = new THREE.Mesh(geo, mat); terrain.position.y = -10; s.add(terrain);
-
-  // Falling data (Particles)
-  const pg = new THREE.BufferGeometry(); const pa = new Float32Array(5000*3);
-  for(let i=0;i<5000;i++){ pa[i*3]=(Math.random()-0.5)*100; pa[i*3+1]=Math.random()*50; pa[i*3+2]=(Math.random()-0.5)*100; }
-  pg.setAttribute('position', new THREE.BufferAttribute(pa,3));
-  const pm = new THREE.PointsMaterial({color:0x00ff00, size:0.2, transparent:true, opacity:0.8});
-  const rain = new THREE.Points(pg, pm); s.add(rain);
-
-  let mx=0, my=0; window.addEventListener('mousemove', e => { mx=(e.clientX/innerWidth-0.5)*2; my=-(e.clientY/innerHeight-0.5)*2; });
-  window.addEventListener('resize', () => { c.aspect=innerWidth/innerHeight; c.updateProjectionMatrix(); r.setSize(innerWidth,innerHeight); });
-
-  const origZ = []; const pos = geo.attributes.position.array;
-  for(let i=0; i<pos.length; i+=3) origZ.push(Math.random()*5);
-
-  function anim(t) {
+<script type="module">
+  import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+  const renderer = new THREE.WebGLRenderer({canvas:document.getElementById('c')});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); renderer.setSize(innerWidth, innerHeight);
+  const scene = new THREE.Scene(); const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+  const geo = new THREE.PlaneGeometry(2, 2);
+  const mat = new THREE.ShaderMaterial({
+    uniforms: { u_time: {value:0}, u_res: {value:new THREE.Vector2(innerWidth, innerHeight)} },
+    vertexShader: `void main(){ gl_Position = vec4(position, 1.0); }`,
+    fragmentShader: `
+      uniform float u_time; uniform vec2 u_res;
+      float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453123); }
+      void main(){
+        vec2 uv = gl_FragCoord.xy / u_res.xy;
+        uv.x *= u_res.x/u_res.y;
+        
+        // Digital Rain simplified
+        vec2 grid = floor(uv * 50.0);
+        vec2 fuv = fract(uv * 50.0);
+        
+        float drop = hash(grid + floor(u_time * 10.0));
+        float col = step(0.95, drop) * step(0.2, fuv.y);
+        
+        // Scanlines
+        col *= sin(gl_FragCoord.y * 2.0) * 0.2 + 0.8;
+        
+        // 3D perspective illusion grid
+        vec2 p = (gl_FragCoord.xy * 2.0 - u_res.xy) / u_res.y;
+        float z = 1.0 / abs(p.y + 0.1);
+        vec2 grid3d = vec2(p.x * z, z) * 10.0;
+        float mask = step(0.1, p.y + 0.1); // floor only
+        float lines = (step(0.9, fract(grid3d.x)) + step(0.9, fract(grid3d.y - u_time*5.0))) * mask;
+        
+        vec3 finalCol = vec3(0.0, 1.0, 0.2) * (col + lines*exp(-z*0.1));
+        gl_FragColor = vec4(finalCol, 1.0);
+      }
+    `
+  });
+  scene.add(new THREE.Mesh(geo, mat));
+  window.addEventListener('resize', ()=>{ renderer.setSize(innerWidth, innerHeight); mat.uniforms.u_res.value.set(innerWidth,innerHeight); });
+  function anim(t){
     requestAnimationFrame(anim);
-    const time = t * 0.001;
-    // Terrain move
-    for(let i=0; i<pos.length; i+=3){ pos[i+1] = origZ[i/3] + Math.sin(pos[i]*0.1 + time)*2 + Math.cos(pos[i+2]*0.1 + time)*2; }
-    geo.attributes.position.needsUpdate = true;
-    terrain.position.z += 0.5; if(terrain.position.z > 200/60) terrain.position.z = 0; // Seamless loop
-
-    // Rain fall
-    const rpos = pg.attributes.position.array;
-    for(let i=0; i<5000; i++){ rpos[i*3+1] -= 0.5; if(rpos[i*3+1] < -10) rpos[i*3+1] = 50; }
-    pg.attributes.position.needsUpdate = true;
-
-    c.position.x += (mx*10 - c.position.x)*0.05; c.position.y += (5 + my*5 - c.position.y)*0.05; c.lookAt(0,0,0);
-    r.render(s, c);
+    mat.uniforms.u_time.value = t*0.001;
+    document.getElementById('hex').innerText = Math.random().toString(16).toUpperCase();
+    renderer.render(scene, camera);
   } anim(0);
 </script>
 </body>

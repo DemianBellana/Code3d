@@ -3,77 +3,76 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>SPACE CINEMATIC // OMEGA.03</title>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;600;700&display=swap" rel="stylesheet">
 <style>
-  body { margin:0; padding:0; background:#010005; color:#fff; font-family:'Rajdhani', sans-serif; overflow:hidden; }
-  canvas { position:fixed; inset:0; z-index:0; }
-  .c-bar { position:fixed; width:100%; height:12vh; background:#000; z-index:10; left:0; transition:height 1s cubic-bezier(0.16,1,0.3,1); }
-  .c-bar.top { top:0; border-bottom:1px solid rgba(168,85,247,0.2); display:flex; align-items:center; padding:0 3rem; }
-  .c-bar.bot { bottom:0; border-top:1px solid rgba(168,85,247,0.2); display:flex; align-items:center; justify-content:space-between; padding:0 3rem; }
-  .logo { font-size:1.5rem; font-weight:700; letter-spacing:0.5em; text-transform:uppercase; text-shadow:0 0 20px #a855f7; }
-  .btn { color:#a855f7; text-decoration:none; font-size:0.9rem; font-weight:600; letter-spacing:0.3em; transition:all 0.3s; }
-  .btn:hover { color:#fff; text-shadow:0 0 10px #fff; }
-  .center-ui { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); z-index:5; text-align:center; pointer-events:none; }
-  .title { font-size:clamp(2rem, 6vw, 5rem); font-weight:300; letter-spacing:0.2em; margin-bottom:1rem; opacity:0; }
-  .scanlines { position:fixed; inset:0; background:linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.25) 50%), linear-gradient(90deg, rgba(255,0,0,0.06), rgba(0,255,0,0.02), rgba(0,0,255,0.06)); background-size:100% 2px, 3px 100%; z-index:9; pointer-events:none; }
-  @media(max-width:768px){ .c-bar{padding:0 1.5rem;} .logo{font-size:1rem;} }
+  body { margin:0; overflow:hidden; background:#000; cursor:none; }
+  canvas { display:block; }
+  #hud { position:fixed; inset:0; pointer-events:none; z-index:10; }
+  .c-bar { position:absolute; left:0; width:100%; height:8vh; background:#000; display:flex; align-items:center; justify-content:center; }
+  .top { top:0; } .bot { bottom:0; }
+  .text { font-family:'Helvetica Neue', sans-serif; font-size:9px; letter-spacing:15px; color:#fff; text-transform:uppercase; }
+  .btn { position:absolute; bottom:10vh; left:50%; transform:translateX(-50%); pointer-events:all; padding:15px 40px; color:#fff; text-decoration:none; font-family:sans-serif; font-size:10px; letter-spacing:4px; border:1px solid rgba(255,255,255,0.2); border-radius:100px; transition:all 0.3s; }
+  .btn:hover { background:#fff; color:#000; box-shadow:0 0 30px #fff; }
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
-<div class="c-bar top"><div class="logo">DEEP_SPACE</div></div>
-<div class="center-ui"><h1 class="title" id="t">EXPEDITION</h1></div>
-<div class="c-bar bot">
-  <div style="font-size:0.7rem;letter-spacing:0.2em;color:rgba(255,255,255,0.4)">VELOCITY: WARP 9</div>
-  <a href="../web3d.html" class="btn">ABORT MISSION</a>
+<div id="hud">
+  <div class="c-bar top"><div class="text">ACCRETION DISK</div></div>
+  <a href="../web3d.html" class="btn">ESCAPE GRAVITY</a>
+  <div class="c-bar bot"><div class="text">EVENT HORIZON</div></div>
 </div>
-<div class="scanlines"></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-<script>
-  const s = new THREE.Scene(); s.fog = new THREE.FogExp2(0x010005, 0.002);
-  const c = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 2000); c.position.z = 0;
-  const r = new THREE.WebGLRenderer({canvas:document.getElementById('c'), antialias:true});
-  r.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); r.setSize(innerWidth, innerHeight);
-
-  // Warp Stars
-  const pc = 15000; const pg = new THREE.BufferGeometry(); const pa = new Float32Array(pc*3);
-  for(let i=0;i<pc;i++){ pa[i*3]=(Math.random()-0.5)*1000; pa[i*3+1]=(Math.random()-0.5)*1000; pa[i*3+2]=(Math.random()-0.5)*2000; }
-  pg.setAttribute('position', new THREE.BufferAttribute(pa,3));
-  const pm = new THREE.PointsMaterial({color:0xffffff, size:1.5, transparent:true, opacity:0.8});
-  const stars = new THREE.Points(pg, pm); s.add(stars);
-
-  // Nebula (Particles)
-  const nc = 1000; const ng = new THREE.BufferGeometry(); const na = new Float32Array(nc*3);
-  for(let i=0;i<nc;i++){ na[i*3]=(Math.random()-0.5)*500; na[i*3+1]=(Math.random()-0.5)*500; na[i*3+2]=(Math.random()-0.5)*1500; }
-  ng.setAttribute('position', new THREE.BufferAttribute(na,3));
-  const nm = new THREE.PointsMaterial({color:0xa855f7, size:40, transparent:true, opacity:0.05, blending:THREE.AdditiveBlending, depthWrite:false});
-  const nebula = new THREE.Points(ng, nm); s.add(nebula);
-
-  let mx=0, my=0; window.addEventListener('mousemove', e => { mx=(e.clientX/innerWidth-0.5)*2; my=-(e.clientY/innerHeight-0.5)*2; });
-  window.addEventListener('resize', () => { c.aspect=innerWidth/innerHeight; c.updateProjectionMatrix(); r.setSize(innerWidth,innerHeight); });
-
-  gsap.to('#t', {opacity:1, letterSpacing:'0.5em', duration:3, ease:'power2.out', delay:1});
-
-  let speed = 2;
-  function anim() {
+<script type="module">
+  import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+  const renderer = new THREE.WebGLRenderer({canvas:document.getElementById('c'), powerPreference:"high-performance"});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); renderer.setSize(innerWidth, innerHeight);
+  const scene = new THREE.Scene(); const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+  const geo = new THREE.PlaneGeometry(2, 2);
+  const mat = new THREE.ShaderMaterial({
+    uniforms: { u_time: {value:0}, u_res: {value:new THREE.Vector2(innerWidth, innerHeight)}, u_mouse: {value:new THREE.Vector2(0,0)} },
+    vertexShader: `void main(){ gl_Position = vec4(position, 1.0); }`,
+    fragmentShader: `
+      uniform float u_time; uniform vec2 u_res; uniform vec2 u_mouse;
+      float noise(vec3 p) { return fract(sin(dot(p, vec3(12.9898, 78.233, 45.164))) * 43758.5453); }
+      void main(){
+        vec2 uv = (gl_FragCoord.xy - 0.5*u_res.xy)/u_res.y;
+        uv += u_mouse * 0.1;
+        float d = length(uv);
+        float angle = atan(uv.y, uv.x);
+        
+        // Gravitational lensing distortion
+        float lens = 1.0 / (d + 0.1);
+        vec2 distort = vec2(cos(angle), sin(angle)) * lens * 0.05;
+        
+        // Accretion disk
+        float disk = smoothstep(0.1, 0.15, d) * smoothstep(0.8, 0.4, d);
+        float swirl = sin(angle * 10.0 + d * 20.0 - u_time * 5.0);
+        disk *= (swirl * 0.5 + 0.5);
+        
+        // Black hole shadow
+        float bh = smoothstep(0.15, 0.16, d);
+        
+        vec3 col = vec3(1.0, 0.5, 0.1) * disk * 2.0;
+        col += vec3(0.5, 0.2, 0.8) * noise(vec3(uv*10.0, u_time)) * disk;
+        col *= bh;
+        
+        // Stars background bent by gravity
+        float st = noise(vec3((uv + distort)*50.0, 0.0));
+        col += vec3(pow(st, 50.0)) * bh;
+        
+        gl_FragColor = vec4(col, 1.0);
+      }
+    `
+  });
+  scene.add(new THREE.Mesh(geo, mat));
+  let mx=0, my=0; window.addEventListener('mousemove', e=>{ mx=e.clientX/innerWidth-0.5; my=-(e.clientY/innerHeight-0.5); });
+  window.addEventListener('resize', ()=>{ renderer.setSize(innerWidth, innerHeight); mat.uniforms.u_res.value.set(innerWidth,innerHeight); });
+  function anim(t){
     requestAnimationFrame(anim);
-    const pos = pg.attributes.position.array;
-    for(let i=0; i<pc; i++){
-      pos[i*3+2] += speed; if(pos[i*3+2] > 100) pos[i*3+2] = -1900;
-    }
-    pg.attributes.position.needsUpdate = true;
-    const npos = ng.attributes.position.array;
-    for(let i=0; i<nc; i++){
-      npos[i*3+2] += speed*0.5; if(npos[i*3+2] > 100) npos[i*3+2] = -1400;
-    }
-    ng.attributes.position.needsUpdate = true;
-
-    c.rotation.x += (my*0.1 - c.rotation.x)*0.05;
-    c.rotation.y += (-mx*0.1 - c.rotation.y)*0.05;
-    c.rotation.z += (mx*0.05 - c.rotation.z)*0.05;
-    r.render(s, c);
-  } anim();
+    mat.uniforms.u_time.value = t*0.001;
+    mat.uniforms.u_mouse.value.x += (mx - mat.uniforms.u_mouse.value.x)*0.05;
+    mat.uniforms.u_mouse.value.y += (my - mat.uniforms.u_mouse.value.y)*0.05;
+    renderer.render(scene, camera);
+  } anim(0);
 </script>
 </body>
 </html>

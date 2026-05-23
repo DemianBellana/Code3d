@@ -3,56 +3,57 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>IMMERSIVE PORTAL // OMEGA.07</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap" rel="stylesheet">
 <style>
-  body { margin:0; padding:0; background:#000; overflow:hidden; font-family:'Orbitron', sans-serif; cursor:crosshair; }
-  canvas { position:fixed; inset:0; z-index:0; }
-  #ui { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:10; pointer-events:none; }
-  .title { font-size:clamp(3rem, 10vw, 8rem); font-weight:900; color:#fff; mix-blend-mode:overlay; text-align:center; line-height:1; letter-spacing:0.1em; animation:glitch 2s infinite; }
-  .btn { position:absolute; bottom:3rem; pointer-events:all; padding:1.5rem 3rem; background:rgba(255,0,255,0.2); border:1px solid #ff00ff; color:#fff; text-decoration:none; text-transform:uppercase; letter-spacing:0.3em; font-size:0.8rem; border-radius:100px; backdrop-filter:blur(10px); transition:all 0.3s; box-shadow:0 0 20px rgba(255,0,255,0.3); }
-  .btn:hover { background:#ff00ff; box-shadow:0 0 50px #ff00ff; transform:scale(1.05); color:#000; }
-  @keyframes glitch { 0%{text-shadow: 2px 2px #00ffff, -2px -2px #ff00ff;} 25%{text-shadow: -2px 2px #00ffff, 2px -2px #ff00ff;} 50%{text-shadow: 2px -2px #00ffff, -2px 2px #ff00ff;} 75%{text-shadow: -2px -2px #00ffff, 2px 2px #ff00ff;} 100%{text-shadow: 2px 2px #00ffff, -2px -2px #ff00ff;} }
+  body { margin:0; overflow:hidden; background:#000; cursor:crosshair; }
+  canvas { display:block; }
+  #hud { position:fixed; inset:0; pointer-events:none; z-index:10; display:flex; justify-content:center; align-items:center; }
+  .btn { position:absolute; bottom:40px; padding:15px 40px; background:transparent; border:1px solid #ff00ff; color:#ff00ff; text-decoration:none; font-family:monospace; font-size:12px; letter-spacing:4px; border-radius:30px; pointer-events:all; transition:0.3s; backdrop-filter:blur(5px); }
+  .btn:hover { background:#ff00ff; color:#000; box-shadow:0 0 40px #ff00ff; }
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
-<div id="ui">
-  <h1 class="title">THE<br>PORTAL</h1>
-  <a href="../web3d.html" class="btn">EXIT DIMENSION</a>
-</div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script>
-  const s = new THREE.Scene(); s.fog = new THREE.Fog(0x000000, 10, 80);
-  const c = new THREE.PerspectiveCamera(70, innerWidth/innerHeight, 0.1, 1000); c.position.z = 20;
-  const r = new THREE.WebGLRenderer({canvas:document.getElementById('c'), antialias:true});
-  r.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); r.setSize(innerWidth, innerHeight);
-
-  // Tunnel effect using multiple Rings
-  const rings = [];
-  const count = 40;
-  for(let i=0; i<count; i++){
-    const geo = new THREE.TorusGeometry(10 + Math.sin(i*0.5)*2, 0.2, 8, 30);
-    const mat = new THREE.MeshBasicMaterial({color: new THREE.Color().setHSL((i/count), 1, 0.5), wireframe:true, transparent:true, opacity:0.8, blending:THREE.AdditiveBlending});
-    const mesh = new THREE.Mesh(geo, mat);
-    mesh.position.z = -i * 3;
-    s.add(mesh); rings.push(mesh);
-  }
-
-  let mx=0, my=0; window.addEventListener('mousemove', e => { mx=(e.clientX/innerWidth-0.5)*2; my=-(e.clientY/innerHeight-0.5)*2; });
-  window.addEventListener('resize', () => { c.aspect=innerWidth/innerHeight; c.updateProjectionMatrix(); r.setSize(innerWidth,innerHeight); });
-
-  function anim(t) {
+<div id="hud"><a href="../web3d.html" class="btn">LEAVE DIMENSION</a></div>
+<script type="module">
+  import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+  const renderer = new THREE.WebGLRenderer({canvas:document.getElementById('c'), powerPreference:"high-performance"});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); renderer.setSize(innerWidth, innerHeight);
+  const scene = new THREE.Scene(); const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+  const mat = new THREE.ShaderMaterial({
+    uniforms: { u_time: {value:0}, u_res: {value:new THREE.Vector2(innerWidth, innerHeight)}, u_mouse: {value:new THREE.Vector2(0,0)} },
+    vertexShader: `void main(){ gl_Position = vec4(position, 1.0); }`,
+    fragmentShader: `
+      uniform float u_time; uniform vec2 u_res; uniform vec2 u_mouse;
+      void main(){
+        vec2 uv = (gl_FragCoord.xy - 0.5*u_res.xy)/u_res.y;
+        vec2 m = u_mouse*0.5;
+        float d = length(uv - m);
+        float a = atan(uv.y - m.y, uv.x - m.x);
+        
+        // Tunnel math
+        float r = 0.5 / d;
+        float u = r + u_time * 2.0;
+        float v = a * 3.0 + sin(u_time + r)*0.5;
+        
+        float grid = sin(u * 10.0) * sin(v * 10.0);
+        vec3 col = vec3(0.5 + 0.5*sin(u_time), 0.0, 0.5 + 0.5*cos(u_time));
+        col *= smoothstep(0.0, 0.1, grid);
+        col *= exp(-d * 2.0); // fade in center
+        col += vec3(1.0, 0.0, 1.0) * exp(-d * 10.0); // glowing core
+        
+        gl_FragColor = vec4(col, 1.0);
+      }
+    `
+  });
+  scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2), mat));
+  let mx=0, my=0; window.addEventListener('mousemove', e=>{ mx=e.clientX/innerWidth-0.5; my=-(e.clientY/innerHeight-0.5); });
+  window.addEventListener('resize', ()=>{ renderer.setSize(innerWidth, innerHeight); mat.uniforms.u_res.value.set(innerWidth,innerHeight); });
+  function anim(t){
     requestAnimationFrame(anim);
-    const time = t * 0.002;
-    rings.forEach((ring, i) => {
-      ring.position.z += 0.5; // Move towards camera
-      if(ring.position.z > 20) ring.position.z = -(count-1)*3 + 20;
-      ring.rotation.z = time * 0.5 + i * 0.1;
-      ring.position.x = Math.sin(time + i*0.2) * 2;
-      ring.position.y = Math.cos(time + i*0.2) * 2;
-    });
-    c.position.x += (mx*5 - c.position.x)*0.05; c.position.y += (my*5 - c.position.y)*0.05;
-    r.render(s, c);
+    mat.uniforms.u_time.value = t*0.001;
+    mat.uniforms.u_mouse.value.x += (mx - mat.uniforms.u_mouse.value.x)*0.1;
+    mat.uniforms.u_mouse.value.y += (my - mat.uniforms.u_mouse.value.y)*0.1;
+    renderer.render(scene, camera);
   } anim(0);
 </script>
 </body>

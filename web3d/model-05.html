@@ -3,78 +3,63 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>DIGITAL LUXURY // OMEGA.05</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300&display=swap" rel="stylesheet">
 <style>
-  body { margin:0; padding:0; background:#030303; color:#c8a97a; font-family:'Playfair Display', serif; overflow:hidden; }
-  canvas { position:fixed; inset:0; z-index:0; }
-  #ui { position:absolute; right:8vw; top:50%; transform:translateY(-50%); text-align:right; z-index:10; pointer-events:none; }
-  .eyebrow { font-family:'Inter', sans-serif; font-size:0.7rem; letter-spacing:0.4em; text-transform:uppercase; margin-bottom:1.5rem; color:rgba(200,169,122,0.6); }
-  .title { font-size:clamp(4rem, 10vw, 8rem); font-weight:400; line-height:1; margin:0; text-shadow:0 10px 30px rgba(0,0,0,0.8); }
-  .title i { font-style:italic; font-weight:700; }
-  .btn { display:inline-block; pointer-events:all; margin-top:3rem; padding:1.2rem 3rem; border:1px solid rgba(200,169,122,0.3); color:#c8a97a; text-decoration:none; font-family:'Inter', sans-serif; font-size:0.7rem; letter-spacing:0.3em; text-transform:uppercase; transition:all 0.5s; background:rgba(0,0,0,0.3); backdrop-filter:blur(10px); }
-  .btn:hover { background:#c8a97a; color:#000; box-shadow:0 0 30px rgba(200,169,122,0.4); }
-  @media(max-width:768px){ #ui{right:auto; left:50%; transform:translate(-50%,-50%); text-align:center;} }
+  body { margin:0; overflow:hidden; background:#000; cursor:none; }
+  canvas { display:block; }
+  #hud { position:fixed; inset:0; pointer-events:none; z-index:10; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  h1 { font-family:serif; font-style:italic; font-size:10vw; color:#fff; mix-blend-mode:difference; font-weight:100; margin:0; }
+  .btn { position:absolute; bottom:5vh; padding:15px 40px; border:1px solid #c8a97a; color:#c8a97a; text-decoration:none; font-family:sans-serif; font-size:10px; letter-spacing:4px; text-transform:uppercase; transition:0.4s; pointer-events:all; }
+  .btn:hover { background:#c8a97a; color:#000; }
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
-<div id="ui">
-  <div class="eyebrow">The Pinnacle of Digital Art</div>
-  <h1 class="title">Pure<br><i>Luxury</i></h1>
-  <a href="../web3d.html" class="btn">Return to Gallery</a>
+<div id="hud">
+  <h1>Aura</h1>
+  <a href="../web3d.html" class="btn">DEPART</a>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-<script>
-  const s = new THREE.Scene(); s.fog = new THREE.Fog(0x030303, 10, 30);
-  const c = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 0.1, 100); c.position.set(0,0,15);
-  const r = new THREE.WebGLRenderer({canvas:document.getElementById('c'), antialias:true});
-  r.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); r.setSize(innerWidth, innerHeight);
-  r.toneMapping = THREE.ACESFilmicToneMapping;
-
-  // Liquid Gold Sphere
-  const geo = new THREE.SphereGeometry(4, 128, 128);
-  const mat = new THREE.MeshStandardMaterial({ color:0xc8a97a, metalness:1, roughness:0.15 });
-  const mesh = new THREE.Mesh(geo, mat);
-  if(innerWidth>768) mesh.position.x = -4; // Offset for desktop
-  s.add(mesh);
-
-  // Lights for reflections
-  const l1 = new THREE.DirectionalLight(0xffffff, 2); l1.position.set(5,10,7); s.add(l1);
-  const l2 = new THREE.DirectionalLight(0xc8a97a, 1.5); l2.position.set(-5,-5,5); s.add(l2);
-  const l3 = new THREE.AmbientLight(0x222222); s.add(l3);
-
-  // Environment for metalness (simple approach)
-  const pmremGenerator = new THREE.PMREMGenerator(r);
-  s.environment = pmremGenerator.fromScene(new THREE.Scene()).texture; // Hacky ambient reflections
-
-  let mx=0, my=0; window.addEventListener('mousemove', e => { mx=(e.clientX/innerWidth-0.5)*2; my=-(e.clientY/innerHeight-0.5)*2; });
-  window.addEventListener('resize', () => { c.aspect=innerWidth/innerHeight; c.updateProjectionMatrix(); r.setSize(innerWidth,innerHeight); if(innerWidth>768) mesh.position.x=-4; else mesh.position.x=0; });
-
-  gsap.from('.eyebrow', {y:20, opacity:0, duration:1.5, delay:0.2});
-  gsap.from('.title', {y:30, opacity:0, duration:1.5, delay:0.4});
-  gsap.from('.btn', {y:20, opacity:0, duration:1.5, delay:0.6});
-
-  const origPos = geo.attributes.position.clone();
-  function anim(t) {
+<script type="module">
+  import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+  const renderer = new THREE.WebGLRenderer({canvas:document.getElementById('c'), antialias:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); renderer.setSize(innerWidth, innerHeight);
+  const scene = new THREE.Scene(); const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+  const geo = new THREE.PlaneGeometry(2, 2);
+  const mat = new THREE.ShaderMaterial({
+    uniforms: { u_time: {value:0}, u_res: {value:new THREE.Vector2(innerWidth, innerHeight)}, u_mouse: {value:new THREE.Vector2(0,0)} },
+    vertexShader: `void main(){ gl_Position = vec4(position, 1.0); }`,
+    fragmentShader: `
+      uniform float u_time; uniform vec2 u_res; uniform vec2 u_mouse;
+      float fbm(vec2 p){ return sin(p.x)+cos(p.y); }
+      void main(){
+        vec2 uv = (gl_FragCoord.xy - 0.5*u_res.xy)/u_res.y;
+        vec2 m = u_mouse * 0.5;
+        
+        // Liquid math
+        float d = length(uv - m);
+        vec2 q = vec2(fbm(uv + u_time*0.2), fbm(uv + vec2(1.0)));
+        vec2 r = vec2(fbm(uv + 1.0*q + vec2(1.7,9.2)+ 0.15*u_time), fbm(uv + 1.0*q + vec2(8.3,2.8)+ 0.126*u_time));
+        float f = fbm(uv + r);
+        
+        // Gold/Titanium palette
+        vec3 col = mix(vec3(0.0), vec3(0.8, 0.6, 0.3), f);
+        col = mix(col, vec3(1.0, 0.9, 0.6), dot(r,r)*0.5);
+        
+        // Ripple from mouse
+        col += vec3(1.0) * exp(-d*10.0) * sin(d*50.0 - u_time*10.0) * 0.2;
+        
+        gl_FragColor = vec4(col, 1.0);
+      }
+    `
+  });
+  scene.add(new THREE.Mesh(geo, mat));
+  let mx=0, my=0; window.addEventListener('mousemove', e=>{ mx=(e.clientX-innerWidth/2)/innerHeight; my=-(e.clientY-innerHeight/2)/innerHeight; });
+  window.addEventListener('resize', ()=>{ renderer.setSize(innerWidth, innerHeight); mat.uniforms.u_res.value.set(innerWidth,innerHeight); });
+  function anim(t){
     requestAnimationFrame(anim);
-    const time = t * 0.001;
-    // Vertex displacement for liquid effect
-    const pos = geo.attributes.position;
-    for(let i=0; i<pos.count; i++){
-      const v = new THREE.Vector3().fromBufferAttribute(origPos, i);
-      const noise = Math.sin(v.x*2 + time) * Math.cos(v.y*2 + time) * Math.sin(v.z*2 + time);
-      v.multiplyScalar(1 + noise * 0.05);
-      pos.setXYZ(i, v.x, v.y, v.z);
-    }
-    pos.needsUpdate = true;
-    geo.computeVertexNormals(); // Crucial for lighting to look right on displaced vertices
-
-    mesh.rotation.y = time * 0.2;
-    mesh.rotation.x = time * 0.1;
-    
-    c.position.x += (mx*2 - c.position.x)*0.05; c.position.y += (my*2 - c.position.y)*0.05; c.lookAt(mesh.position);
-    r.render(s, c);
+    mat.uniforms.u_time.value = t*0.001;
+    mat.uniforms.u_mouse.value.x += (mx - mat.uniforms.u_mouse.value.x)*0.1;
+    mat.uniforms.u_mouse.value.y += (my - mat.uniforms.u_mouse.value.y)*0.1;
+    renderer.render(scene, camera);
   } anim(0);
 </script>
 </body>
