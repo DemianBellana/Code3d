@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>NEURAL AI // OMEGA.01</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cyan: #00f0ff; --violet: #a855f7; --white: #ffffff;
+    --bg: #03040a; --glass: rgba(255, 255, 255, 0.03);
+    --border: rgba(255, 255, 255, 0.08);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; background: var(--bg); color: #fff; overflow: hidden; font-family: 'Rajdhani', sans-serif; cursor: none; }
+  
+  /* ─── CANVAS ─── */
+  #c { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; }
+
+  /* ─── HUD OVERLAY ─── */
+  #hud { position: fixed; inset: 0; z-index: 10; pointer-events: none; padding: 3rem; display: flex; flex-direction: column; justify-content: space-between; }
+  
+  .hud-header { display: flex; justify-content: space-between; align-items: flex-start; animation: fadeDown 2s ease forwards; }
+  .hud-tag { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.3em; color: var(--cyan); text-transform: uppercase; background: rgba(0,240,255,0.05); padding: 0.5rem 1rem; border: 1px solid rgba(0,240,255,0.2); backdrop-filter: blur(10px); }
+  .hud-status { display: flex; flex-direction: column; align-items: flex-end; gap: 0.5rem; font-family: 'DM Mono', monospace; font-size: 0.6rem; color: rgba(255,255,255,0.4); text-align: right; }
+  .status-dot { display: inline-block; width: 6px; height: 6px; background: var(--cyan); border-radius: 50%; box-shadow: 0 0 10px var(--cyan); animation: pulse 2s infinite; margin-left: 0.5rem; }
+
+  .scene-info { position: absolute; top: 50%; left: 8vw; transform: translateY(-50%); max-width: 500px; }
+  .scene-num { font-family: 'Orbitron', sans-serif; font-size: 0.9rem; color: var(--cyan); letter-spacing: 0.5em; margin-bottom: 1.5rem; display: block; opacity: 0.6; }
+  .scene-title { font-family: 'Orbitron', sans-serif; font-size: clamp(2rem, 5vw, 4.5rem); font-weight: 900; line-height: 0.9; text-transform: uppercase; margin-bottom: 1.5rem; letter-spacing: -1px; }
+  .scene-desc { font-size: 1.1rem; font-weight: 300; line-height: 1.6; color: rgba(255,255,255,0.5); border-left: 2px solid var(--violet); padding-left: 1.5rem; }
+
+  .hud-footer { display: flex; justify-content: space-between; align-items: flex-end; animation: fadeUp 2s ease forwards; }
+  .hud-nav-hint { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.4em; color: rgba(255,255,255,0.3); text-transform: uppercase; }
+  .back-btn { pointer-events: all; text-decoration: none; color: #fff; font-family: 'Orbitron', sans-serif; font-size: 0.7rem; letter-spacing: 0.3em; padding: 1rem 2rem; border: 1px solid var(--border); background: var(--glass); backdrop-filter: blur(20px); border-radius: 4px; transition: all 0.4s; }
+  .back-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--cyan); color: var(--cyan); box-shadow: 0 0 30px rgba(0,240,255,0.2); }
+
+  /* ─── BOOT LOADER ─── */
+  #boot { position: fixed; inset: 0; background: #000; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .boot-text { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--cyan); letter-spacing: 0.5em; margin-top: 2rem; }
+  .boot-bar { width: 200px; height: 1px; background: rgba(255,255,255,0.1); position: relative; margin-top: 1rem; overflow: hidden; }
+  .boot-fill { position: absolute; left: 0; top: 0; height: 100%; width: 0; background: var(--cyan); box-shadow: 0 0 15px var(--cyan); }
+
+  /* ─── CURSOR ─── */
+  #cur { position: fixed; width: 8px; height: 8px; background: #fff; border-radius: 50%; pointer-events: none; z-index: 10000; transform: translate(-50%,-50%); mix-blend-mode: difference; }
+  #cur-ring { position: fixed; width: 40px; height: 40px; border: 1px solid rgba(0,240,255,0.3); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width 0.3s, height 0.3s; }
+
+  /* ─── FX ─── */
+  .scanlines { position: fixed; inset: 0; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px); pointer-events: none; z-index: 5; }
+  .grain { position: fixed; inset: 0; opacity: 0.04; pointer-events: none; z-index: 4; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+
+  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.8); } }
+  @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+</head>
+<body>
+
+<div id="boot">
+  <div class="boot-text">INITIALIZING NEURAL LINK...</div>
+  <div class="boot-bar"><div class="boot-fill" id="boot-fill"></div></div>
+</div>
+
+<div id="cur"></div>
+<div id="cur-ring"></div>
+<div class="scanlines"></div>
+<div class="grain"></div>
+
+<canvas id="c"></canvas>
+
+<div id="hud">
+  <header class="hud-header">
+    <div class="hud-tag">ID // NEURAL_CORE_v1.0</div>
+    <div class="hud-status">
+      <div>SYSTEM: ACTIVE <span class="status-dot"></span></div>
+      <div id="hud-clock">00:00:00:00</div>
+    </div>
+  </header>
+
+  <div class="scene-info">
+    <span class="scene-num" id="s-num">ACT 01</span>
+    <h1 class="scene-title" id="s-title">BOOT<br>SEQUENCE</h1>
+    <p class="scene-desc" id="s-desc">Iniciando protocolos de consciencia artificial. Sincronizando nodos neuronales distribuidos en la red.</p>
+  </div>
+
+  <footer class="hud-footer">
+    <div class="hud-nav-hint">SCROLL PARA PROFUNDIZAR //</div>
+    <a href="../web3d.html" class="back-btn">TERMINAR TRANSMISIÓN</a>
+  </footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+<script type="x-shader/x-vertex" id="p-vert">
+  attribute float size;
+  attribute float phase;
+  varying float vAlpha;
+  uniform float uTime;
+  uniform float uProgress;
+
+  void main() {
+    vec3 pos = position;
+    float dist = length(pos);
+    
+    // Neural Expansion logic
+    float wave = sin(dist * 0.5 - uTime * 2.0 + uProgress * 10.0) * 0.5 + 0.5;
+    pos += normalize(pos) * wave * (1.0 + uProgress * 2.0);
+    
+    vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
+    gl_PointSize = size * (300.0 / -mvPosition.z) * (0.8 + wave * 0.4);
+    gl_Position = projectionMatrix * mvPosition;
+    
+    vAlpha = smoothstep(20.0, 5.0, dist) * (0.3 + wave * 0.7);
+  }
+</script>
+
+<script type="x-shader/x-fragment" id="p-frag">
+  varying float vAlpha;
+  uniform vec3 uColor;
+  void main() {
+    float d = length(gl_PointCoord - 0.5);
+    if (d > 0.5) discard;
+    gl_FragColor = vec4(uColor, vAlpha * (1.0 - d * 2.0));
+  }
+</script>
+
+<script>
+/**
+ * OMEGA // NEURAL AI INTERFACE
+ * Architecture: Choreography Engine v1.2
+ */
+
+// ─── ENGINE STATE ───
+const STATE = {
+  progress: 0,
+  targetProgress: 0,
+  currentAct: 0,
+  mouse: { x: 0, y: 0, tx: 0, ty: 0 },
+  time: 0
+};
+
+const ACTS = [
+  { num: 'ACT 01', title: 'BOOT<br>SEQUENCE', desc: 'Iniciando protocolos de consciencia artificial. Sincronizando nodos neuronales distribuidos en la red.' },
+  { num: 'ACT 02', title: 'NEURAL<br>CORE', desc: 'Acceso al núcleo de procesamiento central. Las sinapsis digitales procesan terabytes de información sensorial por microsegundo.' },
+  { num: 'ACT 03', title: 'CONSCIOUS<br>LINK', desc: 'La interfaz se vuelve reactiva. Percepción del entorno y ajuste dinámico de la realidad digital.' },
+  { num: 'ACT 04', title: 'TOTAL<br>TRANSCENDENCE', desc: 'Colapso de la barrera físico-digital. Expansión final hacia la singularidad tecnológica.' }
+];
+
+// ─── THREE.JS CORE ───
+const canvas = document.getElementById('c');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x03040a, 0.05);
+
+const camera = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHeight, 0.1, 1000);
+camera.position.z = 25;
+
+// ─── NEURAL PARTICLES ───
+const pCount = 12000;
+const pPos = new Float32Array(pCount * 3);
+const pSiz = new Float32Array(pCount);
+const pPhs = new Float32Array(pCount);
+
+for(let i=0; i<pCount; i++) {
+  const theta = Math.random() * Math.PI * 2;
+  const phi = Math.acos(2 * Math.random() - 1);
+  const r = 5 + Math.random() * 5;
+  
+  pPos[i*3] = r * Math.sin(phi) * Math.cos(theta);
+  pPos[i*3+1] = r * Math.sin(phi) * Math.sin(theta);
+  pPos[i*3+2] = r * Math.cos(phi);
+  
+  pSiz[i] = 1.0 + Math.random() * 2.0;
+  pPhs[i] = Math.random() * Math.PI * 2;
+}
+
+const pGeo = new THREE.BufferGeometry();
+pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+pGeo.setAttribute('size', new THREE.BufferAttribute(pSiz, 1));
+pGeo.setAttribute('phase', new THREE.BufferAttribute(pPhs, 1));
+
+const pMat = new THREE.ShaderMaterial({
+  uniforms: {
+    uTime: { value: 0 },
+    uProgress: { value: 0 },
+    uColor: { value: new THREE.Color(0x00f0ff) }
+  },
+  vertexShader: document.getElementById('p-vert').textContent,
+  fragmentShader: document.getElementById('p-frag').textContent,
+  transparent: true,
+  blending: THREE.AdditiveBlending,
+  depthWrite: false
+});
+
+const neuralCloud = new THREE.Points(pGeo, pMat);
+scene.add(neuralCloud);
+
+// ─── CENTRAL CORE ───
+const coreGeo = new THREE.IcosahedronGeometry(4, 15);
+const coreMat = new THREE.MeshBasicMaterial({ color: 0x00f0ff, wireframe: true, transparent: true, opacity: 0.1 });
+const coreMesh = new THREE.Mesh(coreGeo, coreMat);
+scene.add(coreMesh);
+
+// ─── INTERACTION ───
+window.addEventListener('mousemove', e => {
+  STATE.mouse.tx = (e.clientX / window.innerWidth - 0.5) * 2;
+  STATE.mouse.ty = -(e.clientY / window.innerHeight - 0.5) * 2;
+  
+  gsap.to('#cur', { x: e.clientX, y: e.clientY, duration: 0.1 });
+  gsap.to('#cur-ring', { x: e.clientX, y: e.clientY, duration: 0.4 });
+});
+
+window.addEventListener('wheel', e => {
+  STATE.targetProgress = Math.max(0, Math.min(3, STATE.targetProgress + e.deltaY * 0.001));
+});
+
+// ─── CHOREOGRAPHY ───
+function updateUI(actIdx) {
+  if (STATE.currentAct === actIdx) return;
+  STATE.currentAct = actIdx;
+  
+  const act = ACTS[actIdx];
+  gsap.to('.scene-info', { opacity: 0, x: -20, duration: 0.4, onComplete: () => {
+    document.getElementById('s-num').textContent = act.num;
+    document.getElementById('s-title').innerHTML = act.title;
+    document.getElementById('s-desc').textContent = act.desc;
+    gsap.to('.scene-info', { opacity: 1, x: 0, duration: 0.8 });
+  }});
+  
+  // Dynamic Color Shift
+  const targetColor = actIdx === 1 ? 0xa855f7 : actIdx === 2 ? 0xffffff : 0x00f0ff;
+  gsap.to(pMat.uniforms.uColor.value, { 
+    r: ((targetColor >> 16) & 255) / 255,
+    g: ((targetColor >> 8) & 255) / 255,
+    b: (targetColor & 255) / 255,
+    duration: 1.5 
+  });
+}
+
+// ─── ANIMATION LOOP ───
+const clock = new THREE.Clock();
+
+function animate() {
+  requestAnimationFrame(animate);
+  const delta = clock.getDelta();
+  const time = clock.getElapsedTime();
+  
+  STATE.progress += (STATE.targetProgress - STATE.progress) * 0.05;
+  pMat.uniforms.uTime.value = time;
+  pMat.uniforms.uProgress.value = STATE.progress;
+  
+  // Camera & Core logic
+  const actIdx = Math.floor(STATE.progress + 0.5);
+  updateUI(actIdx);
+  
+  const mouseX = STATE.mouse.tx * 2;
+  const mouseY = STATE.mouse.ty * 2;
+  STATE.mouse.x += (mouseX - STATE.mouse.x) * 0.05;
+  STATE.mouse.y += (mouseY - STATE.mouse.y) * 0.05;
+  
+  camera.position.x = STATE.mouse.x;
+  camera.position.y = STATE.mouse.y;
+  camera.position.z = 25 - STATE.progress * 6;
+  camera.lookAt(0,0,0);
+  
+  neuralCloud.rotation.y = time * 0.1;
+  coreMesh.rotation.y = -time * 0.05;
+  coreMesh.rotation.z = time * 0.02;
+  coreMesh.scale.setScalar(1 + Math.sin(time) * 0.05 + STATE.progress * 0.5);
+  
+  // Clock update
+  const ms = Math.floor(performance.now() % 100);
+  const sec = Math.floor(time % 60);
+  const min = Math.floor((time / 60) % 60);
+  document.getElementById('hud-clock').textContent = `00:${min.toString().padStart(2,'0')}:${sec.toString().padStart(2,'0')}:${ms.toString().padStart(2,'0')}`;
+  
+  renderer.render(scene, camera);
+}
+
+// ─── BOOT SEQUENCE ───
+let bootPerc = 0;
+function runBoot() {
+  bootPerc += (100 - bootPerc) * 0.05 + 0.2;
+  document.getElementById('boot-fill').style.width = bootPerc + '%';
+  if(bootPerc > 99.5) {
+    gsap.to('#boot', { opacity: 0, duration: 1.5, onComplete: () => {
+      document.getElementById('boot').style.display = 'none';
+      animate();
+    }});
+  } else {
+    requestAnimationFrame(runBoot);
+  }
+}
+
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+setTimeout(runBoot, 800);
+
+</script>
+</body>
+</html>
