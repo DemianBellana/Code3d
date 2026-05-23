@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>INTERNAL CORE // TACTICAL COMMAND NEXUS</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<style>
+  :root { --c: #ff0000; --bg: #03040a; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { width: 100%; height: 100%; background:var(--bg); color:#fff; font-family:'Rajdhani', sans-serif; overflow:hidden; cursor:none; }
+  canvas { position:fixed; inset:0; z-index:0; }
+  
+  /* TRANSITION OVERLAY */
+  #wipe { position:fixed; inset:0; background:var(--c); z-index:9999; transform-origin:right; transform:scaleX(1); }
+  
+  /* CURSOR */
+  #cur { position: fixed; width: 6px; height: 6px; background: #fff; border-radius: 50%; pointer-events: none; z-index: 10000; transform: translate(-50%,-50%); mix-blend-mode: difference; }
+  #cur-ring { position: fixed; width: 40px; height: 40px; border: 1px solid var(--c); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width 0.3s, height 0.3s; opacity:0.6; }
+  
+  /* ATMOSPHERE FX */
+  .vignette { position:fixed; inset:0; background:radial-gradient(circle at 50% 50%, transparent 20%, #000 150%); z-index:2; pointer-events:none; }
+  .scanlines { position:fixed; inset:0; background:linear-gradient(to bottom, transparent 50%, rgba(255,255,255,0.02) 50%); background-size:100% 4px; z-index:3; pointer-events:none; }
+  
+  /* HUD */
+  #hud { position:fixed; inset:0; z-index:10; pointer-events:none; padding:3rem; display:flex; flex-direction:column; justify-content:space-between; }
+  .tag { font-family:'DM Mono', monospace; font-size:10px; letter-spacing:5px; color:var(--c); text-transform:uppercase; background:rgba(255,255,255,0.02); padding:10px 20px; border:1px solid rgba(255,255,255,0.05); align-self:flex-start; backdrop-filter:blur(5px); }
+  
+  
+  .content { position:absolute; top:50%; left:8vw; transform:translateY(-50%); max-width:600px; }
+  .act { font-family:'Orbitron', sans-serif; font-size:12px; color:var(--c); letter-spacing:4px; margin-bottom:15px; display:block; }
+  .title { font-family:'Orbitron', sans-serif; font-size:clamp(3rem, 7vw, 6rem); font-weight:900; line-height:0.9; margin-bottom:25px; text-transform:uppercase; letter-spacing:-2px; text-shadow:0 0 40px rgba(255,255,255,0.1); }
+  .desc { font-size:18px; font-weight:300; line-height:1.6; color:rgba(255,255,255,0.6); border-left:2px solid var(--c); padding-left:20px; }
+  
+
+  
+
+  .btn-next { 
+    pointer-events:all; align-self:flex-end; padding:15px 40px; 
+    background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.1); 
+    color:#fff; text-decoration:none; font-family:'Orbitron', sans-serif; 
+    font-size:10px; letter-spacing:4px; transition:all 0.4s; 
+    backdrop-filter:blur(20px); text-transform:uppercase;
+  }
+  .btn-next:hover { background:var(--c); color:#000; box-shadow:0 0 40px var(--c); border-color:var(--c); padding-right:50px; }
+  
+  @media(max-width:768px) {
+    #hud { padding:1.5rem; }
+    .content { left:1.5rem; max-width:90%; }
+    .btn-next { align-self:center; width:100%; text-align:center; padding:15px 20px; }
+  }
+</style>
+</head>
+<body>
+<div id="wipe"></div>
+<div class="vignette"></div>
+<div class="scanlines"></div>
+<div id="cur"></div>
+<div id="cur-ring"></div>
+
+<canvas id="c"></canvas>
+
+<div id="hud">
+  <div class="tag">OMEGA_SYS // TACTICAL COMMAND NEXUS</div>
+  
+  <div class="content">
+    <span class="act">ACT 02 // CORE</span>
+    <h1 class="title">INTERNAL CORE</h1>
+    <p class="desc">Centro de comando táctico. Evaluación de amenazas y radares volumétricos.</p>
+    
+    
+  </div>
+  
+  <a href="page-03.html" class="btn-next" id="nextBtn">PROCEED DEEPER →</a>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script>
+  // Seamless Dimensional Transition
+  gsap.to('#wipe', {scaleX: 0, duration: 1.5, ease: 'expo.inOut'});
+  
+  document.getElementById('nextBtn').addEventListener('click', e => {
+    e.preventDefault();
+    gsap.to('#wipe', {scaleX: 1, duration: 1.2, ease: 'expo.inOut', transformOrigin: 'left', onComplete: () => window.location.href = e.currentTarget.href});
+  });
+
+  // Cinematic Cursor (Mouse + Touch)
+  let mx=0, my=0, cx=0, cy=0;
+  const cur = document.getElementById('cur'), ring = document.getElementById('cur-ring');
+  
+  function updatePointer(x, y) {
+    mx = (x / innerWidth - 0.5) * 2; 
+    my = -(y / innerHeight - 0.5) * 2;
+    gsap.to(cur, {x: x, y: y, duration: 0.1});
+    gsap.to(ring, {x: x, y: y, duration: 0.4});
+  }
+  window.addEventListener('mousemove', e => updatePointer(e.clientX, e.clientY));
+  window.addEventListener('touchmove', e => updatePointer(e.touches[0].clientX, e.touches[0].clientY));
+  
+  document.querySelectorAll('a').forEach(el => {
+    el.addEventListener('mouseenter', () => gsap.to(ring, {width:60, height:60, borderColor:'#fff'}));
+    el.addEventListener('mouseleave', () => gsap.to(ring, {width:40, height:40, borderColor:'var(--c)'}));
+  });
+
+  // WebGL Cinematic Engine
+  const s = new THREE.Scene(); s.fog = new THREE.FogExp2(0x020308, 0.04);
+  const c = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 0.1, 1000);
+  c.position.z = 20;
+  
+  const r = new THREE.WebGLRenderer({canvas:document.getElementById('c'), antialias:true, alpha:true});
+  r.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); 
+  r.setSize(innerWidth, innerHeight);
+  r.toneMapping = THREE.ACESFilmicToneMapping;
+  
+  // Base Particles (Shared DNA across all dimensions)
+  const pCount = 5000; const pPos = new Float32Array(pCount*3);
+  for(let i=0;i<pCount;i++){ pPos[i*3]=(Math.random()-0.5)*100; pPos[i*3+1]=(Math.random()-0.5)*100; pPos[i*3+2]=(Math.random()-0.5)*100; }
+  const pGeo = new THREE.BufferGeometry(); pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+  const pMat = new THREE.PointsMaterial({color: 0xff0000, size: 0.05, transparent:true, opacity:0.4, blending:THREE.AdditiveBlending});
+  const particles = new THREE.Points(pGeo, pMat); s.add(particles);
+
+  // Cinematic Lighting
+  const l1 = new THREE.PointLight(0xff0000, 2, 100); l1.position.set(10,15,10); s.add(l1);
+  const l2 = new THREE.PointLight(0xffffff, 1, 100); l2.position.set(-10,-15,10); s.add(l2);
+  s.add(new THREE.AmbientLight(0xffffff, 0.1));
+
+  // Specific Dimensional Geometry
+  let obj, obj2;
+  obj = new THREE.Mesh(new THREE.SphereGeometry(6,32,32), new THREE.MeshBasicMaterial({color:0xff0000, wireframe:true, transparent:true, opacity:0.15})); obj2 = new THREE.Points(new THREE.SphereGeometry(6.1,32,32), new THREE.PointsMaterial({color:0xffffff, size:0.05}));
+  if(obj) s.add(obj);
+  if(obj2) s.add(obj2);
+
+  const clock = new THREE.Clock();
+  function anim() {
+    requestAnimationFrame(anim);
+    const t = clock.getElapsedTime() * 0.5;
+    
+    particles.rotation.y = t * 0.05;
+    
+    if(obj) { 
+      obj.rotation.x = t*0.2; obj.rotation.y = t*0.3; 
+      
+    }
+    if(obj2) { obj2.rotation.y = -t*0.4; }
+
+    
+
+    // Camera Cinematic Smoothing & Touch Parallax
+    c.position.x += (mx * 8 - c.position.x) * 0.05;
+    c.position.y += (my * 8 - c.position.y) * 0.05;
+    c.lookAt(0,0,0);
+    
+    
+
+    r.render(s, c);
+  } 
+  anim();
+
+  window.addEventListener('resize', () => { 
+    c.aspect=innerWidth/innerHeight; c.updateProjectionMatrix(); 
+    r.setSize(innerWidth,innerHeight); 
+  });
+</script>
+</body>
+</html>

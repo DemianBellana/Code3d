@@ -2,87 +2,125 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>OMEGA HUB // DIMENSIONAL HANGAR</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<title>CODE NO FRONTIER — Web3D Hub</title>
+<!-- TIPOGRAFÍA ADN MAESTRO -->
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@200;400;600&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
 <style>
-  :root { --bg: #020308; --c-cyan: #00ffe0; --c-violet: #a855f7; --c-white: #ffffff; }
+  :root {
+    --accent: #ff3c3c;
+    --accent2: #00ffe0;
+    --bg: #04060d;
+    --text: #ffffff;
+    --muted: rgba(255, 255, 255, 0.4);
+    --glass: rgba(10, 12, 20, 0.6);
+    --border: rgba(255, 255, 255, 0.05);
+  }
+  
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { width: 100%; height: 100%; background: var(--bg); color: #fff; overflow: hidden; font-family: 'Rajdhani', sans-serif; cursor: none; user-select: none; }
+  
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--bg); color: var(--text);
+    overflow: hidden; font-family: 'Outfit', sans-serif;
+    cursor: none; user-select: none;
+  }
 
   /* ─── MASTER CANVAS ─── */
   #webgl-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; }
-  #vignette { position: fixed; inset: 0; background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.9) 120%); z-index: 5; pointer-events: none; }
+  
+  /* OVERLAYS ADN SERVICIOS */
+  .vignette { position: fixed; inset: 0; background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(0,0,0,0.85) 100%); z-index: 5; pointer-events: none; }
   .noise { position: fixed; inset: 0; z-index: 6; pointer-events: none; opacity: 0.04; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .scanlines { position: fixed; inset: 0; z-index: 7; pointer-events: none; background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.02) 2px, rgba(0,0,0,0.02) 4px); }
 
-  /* ─── UI HEADER ─── */
-  header { position: absolute; top: 0; left: 0; right: 0; padding: 2.5rem 4vw; z-index: 100; display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
-  .logo-area { display: flex; flex-direction: column; gap: 0.2rem; }
-  .brand { font-family: 'Orbitron', sans-serif; font-size: 1rem; font-weight: 900; letter-spacing: 0.5em; color: #fff; text-shadow: 0 0 20px rgba(0,255,224,0.3); }
-  .brand span { color: var(--c-cyan); }
-  .sub-brand { font-size: 0.6rem; letter-spacing: 0.8em; color: rgba(255,255,255,0.3); text-transform: uppercase; }
-  .nav-btn { pointer-events: all; font-family: 'Orbitron', monospace; font-size: 0.6rem; letter-spacing: 0.2em; color: rgba(255,255,255,0.5); text-decoration: none; border: 1px solid rgba(255,255,255,0.1); padding: 0.8rem 1.5rem; border-radius: 4px; transition: all 0.3s; backdrop-filter: blur(10px); }
-  .nav-btn:hover { color: #fff; border-color: var(--c-cyan); background: rgba(0,255,224,0.05); }
+  /* ─── NAV ADN MAESTRO ─── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.8rem 4vw; backdrop-filter: blur(10px);
+  }
+  .logo {
+    font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 0.1em;
+    color: #fff; text-decoration: none; display: flex; align-items: center;
+  }
+  .logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 3rem; list-style: none; }
+  .nav-links a {
+    color: var(--muted); text-decoration: none; font-size: 0.75rem;
+    letter-spacing: 0.2em; text-transform: uppercase; transition: color 0.4s;
+  }
+  .nav-links a:hover { color: #fff; }
 
   /* ─── HANGAR SLIDER ─── */
   .hangar-container { position: absolute; inset: 0; z-index: 10; display: flex; align-items: center; justify-content: center; perspective: 2000px; }
   .slider { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transform-style: preserve-3d; }
   
   .card {
-    position: absolute; width: 380px; height: 540px;
-    background: rgba(5,7,12,0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 24px;
+    position: absolute; width: 420px; height: 580px;
+    background: var(--glass); border: 1px solid var(--border); border-radius: 20px;
     display: flex; flex-direction: column; overflow: hidden;
     transform-origin: center center; transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s, border-color 0.4s;
-    backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(40px) saturate(140%); -webkit-backdrop-filter: blur(40px) saturate(140%);
     pointer-events: none; opacity: 0; text-decoration: none; cursor: none;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.6);
   }
   
-  .card.active { pointer-events: all; opacity: 1; border-color: rgba(255,255,255,0.2); box-shadow: 0 40px 100px rgba(0,0,0,0.8); }
-  .card.prev, .card.next { opacity: 0.2; pointer-events: all; }
+  .card.active { pointer-events: all; opacity: 1; border-color: rgba(255,255,255,0.15); box-shadow: 0 50px 120px rgba(0,0,0,0.9), 0 0 40px rgba(255,60,60,0.05); }
+  .card.prev, .card.next { opacity: 0.15; pointer-events: all; }
   
   /* Portal Viewport */
-  .portal-view { position: relative; width: 100%; height: 60%; background: #000; overflow: hidden; border-bottom: 1px solid rgba(255,255,255,0.05); }
-  .portal-view::after { content:''; position:absolute; inset:0; background:linear-gradient(to top, #000, transparent 30%); pointer-events:none; }
+  .portal-view { position: relative; width: 100%; height: 60%; background: #000; overflow: hidden; border-bottom: 1px solid rgba(255,255,255,0.03); }
+  .portal-view::after { content:''; position:absolute; inset:0; background:linear-gradient(to top, rgba(4,6,13,1), transparent 30%); pointer-events:none; }
 
-  .card-info { padding: 2rem; flex: 1; display: flex; flex-direction: column; justify-content: space-between; background: linear-gradient(to bottom, rgba(5,7,12,0) 0%, rgba(5,7,12,1) 100%); }
-  .card-id { font-family: 'Orbitron', monospace; font-size: 0.7rem; color: var(--c-cyan); letter-spacing: 0.4em; opacity: 0.6; }
-  .card-title { font-family: 'Orbitron', sans-serif; font-size: 1.8rem; font-weight: 900; line-height: 1; color: #fff; margin: 0.5rem 0; letter-spacing: -1px; }
-  .card-desc { font-size: 0.85rem; color: rgba(255,255,255,0.4); line-height: 1.5; margin-bottom: 1.5rem; }
-  .btn-enter { align-self: flex-start; padding: 0.8rem 1.5rem; background: var(--c-cyan); color: #000; font-family: 'Orbitron', sans-serif; font-size: 0.65rem; font-weight: 900; letter-spacing: 0.2em; text-transform: uppercase; border: none; border-radius: 4px; transition: all 0.3s; }
-  .card.active:hover .btn-enter { transform: translateX(10px); box-shadow: 0 0 30px var(--c-cyan); }
+  .card-info { padding: 2.5rem; flex: 1; display: flex; flex-direction: column; justify-content: space-between; background: linear-gradient(to bottom, transparent 0%, rgba(4,6,13,0.8) 100%); }
+  .card-id { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--accent2); letter-spacing: 0.4em; }
+  .card-title { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; font-weight: 400; line-height: 0.9; color: #fff; margin: 0.8rem 0; letter-spacing: 0.02em; }
+  .card-desc { font-family: 'Outfit', sans-serif; font-size: 0.95rem; color: var(--muted); line-height: 1.6; font-weight: 300; }
+  
+  .btn-enter { 
+    align-self: flex-start; margin-top: 1.5rem; padding: 1rem 2rem; 
+    background: var(--accent); color: #fff; border: none; 
+    font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; 
+    letter-spacing: 0.1em; border-radius: 4px; transition: all 0.4s;
+    box-shadow: 0 10px 30px rgba(255, 60, 60, 0.3);
+  }
+  .card.active:hover .btn-enter { transform: translateX(10px) scale(1.05); box-shadow: 0 15px 40px rgba(255, 60, 60, 0.5); }
 
-  /* ─── CURSOR ─── */
+  /* ─── CURSOR ADN SERVICIOS ─── */
   #cursor { position: fixed; width: 8px; height: 8px; background: #fff; border-radius: 50%; pointer-events: none; z-index: 10000; transform: translate(-50%,-50%); mix-blend-mode: difference; }
-  #cursor-ring { position: fixed; width: 40px; height: 40px; border: 1px solid rgba(0,255,224,0.4); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width 0.3s, height 0.3s; }
+  #cursor-ring { position: fixed; width: 38px; height: 38px; border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width 0.3s, height 0.3s, border-color 0.3s; }
 
-  /* ─── FOOTER ─── */
-  .footer-hud { position: absolute; bottom: 0; left: 0; right: 0; padding: 2.5rem 4vw; z-index: 100; display: flex; justify-content: space-between; align-items: flex-end; pointer-events: none; }
-  .status-line { font-family: 'Orbitron', monospace; font-size: 0.6rem; color: rgba(255,255,255,0.2); letter-spacing: 0.3em; }
-  .status-line span { color: var(--c-cyan); }
+  /* ─── FOOTER HUD ─── */
+  .footer-hud { position: absolute; bottom: 0; left: 0; right: 0; padding: 3rem 4vw; z-index: 100; display: flex; justify-content: space-between; align-items: flex-end; pointer-events: none; }
+  .status-line { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--muted); letter-spacing: 0.3em; text-transform: uppercase; }
+  .status-line span { color: var(--accent2); }
 
   @media(max-width:768px){
-    .card { width: 85vw; height: 70vh; }
-    .card-title { font-size: 1.4rem; }
-    header { padding: 1.5rem; }
-    .brand { font-size: 0.8rem; }
+    .card { width: 88vw; height: 75vh; }
+    .card-title { font-size: 2.2rem; }
+    header { padding: 1.5rem 2rem; }
+    .nav-links { display: none; }
   }
 </style>
 </head>
 <body>
 
 <div class="noise"></div>
-<div id="vignette"></div>
+<div class="vignette"></div>
+<div class="scanlines"></div>
 <div id="cursor"></div>
 <div id="cursor-ring"></div>
 
 <canvas id="webgl-canvas"></canvas>
 
-<header>
-  <div class="logo-area">
-    <div class="brand">OMEGA<span>.</span>HANGAR</div>
-    <div class="sub-brand">Dimensional Selection Protocol</div>
-  </div>
-  <a href="index.html" class="nav-btn">VOLVER AL PORTAL</a>
-</header>
+<nav>
+  <a href="index.html" class="logo">CODE<span>NO</span>FRONTIER</a>
+  <ul class="nav-links">
+    <li><a href="index.html#servicios">Servicios</a></li>
+    <li><a href="index.html#proceso">Proceso</a></li>
+    <li><a href="index.html#contacto">Contacto</a></li>
+  </ul>
+</nav>
 
 <div class="hangar-container">
   <div class="slider" id="slider">
@@ -91,8 +129,8 @@
 </div>
 
 <div class="footer-hud">
-  <div class="status-line">UPLINK_STATUS: <span>OPTIMAL</span> // NODE_ACTIVE: <span id="node-id">01</span></div>
-  <div class="status-line">SCROLL TO ROTATE DIMENSIONS</div>
+  <div class="status-line">TERMINAL: <span>ONLINE</span> // SECTOR_ACTIVE: <span id="node-id">01</span></div>
+  <div class="status-line">SWIPE / SCROLL DIMENSIONS</div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -100,16 +138,16 @@
   import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
 
   const models = [
-    { id: '01', title: 'NEURAL AI', desc: 'Sincronización de sinapsis neuronales y núcleos de consciencia artificial.', type: 'neural' },
-    { id: '02', title: 'CORPORATE CORE', desc: 'Arquitectura estéril de procesamiento masivo y protocolos corporativos.', type: 'crystal' },
-    { id: '03', title: 'COSMIC LAYER', desc: 'Simulación astrofísica de horizontes de sucesos y nubes galácticas.', type: 'galaxy' },
-    { id: '04', title: 'OPERATING SYS', desc: 'Capas operativas y flujos logísticos de datos en tiempo real.', type: 'rings' },
-    { id: '05', title: 'NEURAL CHAMBER', desc: 'Refinamiento estético y sensorial mediante metal líquido fractal.', type: 'liquid' },
-    { id: '06', title: 'FORBIDDEN NET', desc: 'Sub-capas de entropía controlada y redes de datos prohibidas.', type: 'grid' },
-    { id: '07', title: 'DIMENSIONAL GW', desc: 'Punto de enlace cuántico entre la consciencia y el multiverso.', type: 'portal' },
-    { id: '08', title: 'SYNTHETIC CITY', desc: 'Megaciudad generativa instanciada bajo cielos de datos rojos.', type: 'city' },
-    { id: '09', title: 'TACTICAL NEXUS', desc: 'Centro de comando táctico y visualización de amenazas globales.', type: 'globe' },
-    { id: '10', title: 'TRANSCENDENCE', desc: 'La evolución final. Singularidad alcanzada y omnipresencia digital.', type: 'fractal' }
+    { id: '01', title: 'NEURAL AI', desc: 'Sincronización de sinapsis neuronales y núcleos de consciencia artificial.', type: 'neural', link: 'web3d/model-01.html' },
+    { id: '02', title: 'CORPORATE CORE', desc: 'Arquitectura estéril de procesamiento masivo y protocolos corporativos.', type: 'crystal', link: 'web3d/model-02/index.html' },
+    { id: '03', title: 'COSMIC LAYER', desc: 'Simulación astrofísica de horizontes de sucesos y nubes galácticas.', type: 'galaxy', link: 'web3d/model-03/index.html' },
+    { id: '04', title: 'OPERATING SYS', desc: 'Capas operativas y flujos logísticos de datos en tiempo real.', type: 'rings', link: 'web3d/model-04/index.html' },
+    { id: '05', title: 'NEURAL CHAMBER', desc: 'Refinamiento estético y sensorial mediante metal líquido fractal.', type: 'liquid', link: 'web3d/model-05/index.html' },
+    { id: '06', title: 'FORBIDDEN NET', desc: 'Sub-capas de entropía controlada y redes de datos prohibidas.', type: 'grid', link: 'web3d/model-06/index.html' },
+    { id: '07', title: 'DIMENSIONAL GW', desc: 'Punto de enlace cuántico entre la consciencia y el multiverso.', type: 'portal', link: 'web3d/model-07/index.html' },
+    { id: '08', title: 'SYNTHETIC CITY', desc: 'Megaciudad generativa instanciada bajo cielos de datos rojos.', type: 'city', link: 'web3d/model-08/index.html' },
+    { id: '09', title: 'TACTICAL NEXUS', desc: 'Centro de comando táctico y visualización de amenazas globales.', type: 'globe', link: 'web3d/model-09/index.html' },
+    { id: '10', title: 'TRANSCENDENCE', desc: 'La evolución final. Singularidad alcanzada y omnipresencia digital.', type: 'fractal', link: 'web3d/model-10/index.html' }
   ];
 
   // ─── ENGINE SETUP ───
@@ -118,14 +156,12 @@
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.setSize(window.innerWidth, window.innerHeight);
 
-  const masterScene = new THREE.Scene();
   const hangarCamera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000);
-  hangarCamera.position.z = 20;
+  hangarCamera.position.z = 22;
 
   // ─── PORTAL PREVIEW ENGINE ───
   const portalScenes = models.map((m, i) => {
     const scene = new THREE.Scene();
-    // Add specific objects per scene
     let obj;
     if(m.type === 'neural') {
        obj = new THREE.Points(new THREE.IcosahedronGeometry(4, 2), new THREE.PointsMaterial({color: 0x00f0ff, size: 0.1}));
@@ -159,19 +195,19 @@
   const slider = document.getElementById('slider');
   models.forEach((m, i) => {
     const el = document.createElement('a');
-    el.href = `web3d/model-${m.id}.html`;
-    el.className = `card`;
-    el.innerHTML = `
-      <div class="portal-view" id="portal-${i}"></div>
+    el.href = m.link;
+    el.className = \`card\`;
+    el.innerHTML = \`
+      <div class="portal-view" id="portal-\${i}"></div>
       <div class="card-info">
         <div>
-          <div class="card-id">SECTOR // ${m.id}</div>
-          <h2 class="card-title">${m.title}</h2>
-          <p class="card-desc">${m.desc}</p>
+          <div class="card-id">SECTOR // \${m.id}</div>
+          <h2 class="card-title">\${m.title}</h2>
+          <p class="card-desc">\${m.desc}</p>
         </div>
-        <button class="btn-enter">INICIAR SECUENCIA →</button>
+        <button class="btn-enter">PENETRAR DIMENSIÓN →</button>
       </div>
-    `;
+    \`;
     slider.appendChild(el);
     el.addEventListener('click', (e) => {
       e.preventDefault();
@@ -179,9 +215,8 @@
          targetIndex = i;
          updateSlider();
       } else {
-         // Seamless zoom transition
-         gsap.to(hangarCamera.position, { z: 2, duration: 1.5, ease: 'expo.inOut', onComplete: () => window.location.href = el.href });
-         gsap.to(el, { scale: 2, opacity: 0, duration: 1.5 });
+         gsap.to(hangarCamera.position, { z: 4, duration: 1.5, ease: 'expo.inOut', onComplete: () => window.location.href = el.href });
+         gsap.to(el, { scale: 1.5, opacity: 0, duration: 1.2 });
       }
     });
   });
@@ -198,19 +233,19 @@
       const offset = i - activeIndex;
       if (offset === 0) {
         card.classList.add('active');
-        card.style.transform = `translate3d(0, 0, 0) scale(1) rotateY(0deg)`;
+        card.style.transform = \`translate3d(0, 0, 0) scale(1) rotateY(0deg)\`;
         card.style.zIndex = 10;
       } else if (offset === -1) {
         card.classList.add('prev');
-        card.style.transform = `translate3d(-380px, 0, -300px) scale(0.8) rotateY(30deg)`;
+        card.style.transform = \`translate3d(-400px, 0, -350px) scale(0.8) rotateY(25deg)\`;
         card.style.zIndex = 5;
       } else if (offset === 1) {
         card.classList.add('next');
-        card.style.transform = `translate3d(380px, 0, -300px) scale(0.8) rotateY(-30deg)`;
+        card.style.transform = \`translate3d(400px, 0, -350px) scale(0.8) rotateY(-25deg)\`;
         card.style.zIndex = 5;
       } else {
         const sign = Math.sign(offset);
-        card.style.transform = `translate3d(${sign * 800}px, 0, -600px) scale(0.5) rotateY(${sign * -45}deg)`;
+        card.style.transform = \`translate3d(\${sign * 900}px, 0, -700px) scale(0.4) rotateY(\${sign * -40}deg)\`;
         card.style.zIndex = 1;
       }
     });
@@ -220,39 +255,32 @@
   let scrollAccum = 0;
   window.addEventListener('wheel', e => {
     scrollAccum += e.deltaY;
-    if (Math.abs(scrollAccum) > 100) {
+    if (Math.abs(scrollAccum) > 80) {
       targetIndex = Math.max(0, Math.min(models.length - 1, activeIndex + (scrollAccum > 0 ? 1 : -1)));
       scrollAccum = 0;
       updateSlider();
     }
   });
 
-  let mx=0, my=0, cx=0, cy=0;
+  let mx=0, my=0;
   window.addEventListener('mousemove', e => {
     mx=e.clientX; my=e.clientY;
     gsap.to('#cursor', {x:mx, y:my, duration:0.1});
     gsap.to('#cursor-ring', {x:mx, y:my, duration:0.4});
   });
 
-  // ─── RENDER LOOP (Scissor Testing for Portals) ───
   const clock = new THREE.Clock();
   function animate() {
     requestAnimationFrame(animate);
     const t = clock.getElapsedTime();
-
-    // Render Master Hangar (Background)
     renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
     renderer.setScissorTest(false);
     renderer.clear();
-    // (Optional: add hangar background objects here)
     
-    // Render Portal Previews
     cards.forEach((card, i) => {
-      // Only render if card is somewhat visible (active, prev, next)
       if (Math.abs(i - activeIndex) > 1) return;
-
-      const rect = document.getElementById(`portal-${i}`).getBoundingClientRect();
-      if (rect.bottom < 0 || rect.top > window.innerHeight || rect.right < 0 || rect.left > window.innerWidth) return;
+      const rect = document.getElementById(\`portal-\${i}\`).getBoundingClientRect();
+      if (rect.bottom < 0 || rect.top > window.innerHeight) return;
 
       const width = rect.right - rect.left;
       const height = rect.bottom - rect.top;
@@ -265,13 +293,10 @@
 
       const portalScene = portalScenes[i];
       const portalObj = portalScene.userData.obj;
-      portalObj.rotation.y = t * 0.5;
-      portalObj.rotation.x = Math.sin(t * 0.3) * 0.2;
+      portalObj.rotation.y = t * 0.4;
+      portalObj.rotation.x = Math.sin(t * 0.2) * 0.1;
       
-      // Hover reaction
-      if (i === activeIndex) {
-         portalObj.scale.setScalar(1 + Math.sin(t * 2) * 0.05);
-      }
+      if (i === activeIndex) portalObj.scale.setScalar(1 + Math.sin(t * 1.5) * 0.05);
 
       renderer.render(portalScene, hangarCamera);
     });
