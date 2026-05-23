@@ -1,62 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>GOD TIER // OMEGA.10</title>
+<title>TRANSCENDENCE // OMEGA.10</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
-  body { margin:0; overflow:hidden; background:#000; cursor:none; }
-  canvas { display:block; }
-  #hud { position:fixed; inset:0; pointer-events:none; z-index:10; display:flex; justify-content:center; align-items:center; mix-blend-mode:difference; }
-  h1 { font-family:sans-serif; font-size:15vw; color:#fff; margin:0; line-height:1; letter-spacing:-5px; }
-  .btn { position:absolute; bottom:5vh; padding:15px 40px; border:2px solid #fff; color:#fff; text-decoration:none; font-family:sans-serif; font-size:12px; font-weight:900; letter-spacing:5px; pointer-events:all; transition:0.3s; }
-  .btn:hover { background:#fff; color:#000; }
+  :root { --white: #ffffff; --bg: #000; --glass: rgba(255, 255, 255, 0.02); --border: rgba(255, 255, 255, 0.3); }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; background: var(--bg); color: #fff; overflow: hidden; font-family: 'Rajdhani', sans-serif; cursor: none; }
+  canvas { position: fixed; inset: 0; z-index: 0; }
+  #hud { position: fixed; inset: 0; z-index: 10; pointer-events: none; display: flex; flex-direction: column; justify-content: center; align-items: center; mix-blend-mode: difference; }
+  .title { font-family: 'Orbitron', sans-serif; font-size: clamp(4rem, 15vw, 12rem); font-weight: 900; letter-spacing: 0.2em; }
+  .back-btn { pointer-events: all; text-decoration: none; color: #fff; font-family: 'Orbitron', sans-serif; font-size: 0.8rem; letter-spacing: 0.5em; padding: 1.5rem 4rem; border: 2px solid #fff; background: transparent; transition: all 0.4s; position: absolute; bottom: 8vh; }
+  .back-btn:hover { background: #fff; color: #000; }
+  #cur { position: fixed; width: 6px; height: 6px; background: #fff; border-radius: 50%; pointer-events: none; z-index: 10000; transform: translate(-50%,-50%); }
 </style>
 </head>
 <body>
+<div id="cur"></div>
 <canvas id="c"></canvas>
-<div id="hud"><h1>OMNIPRESENCE</h1><a href="../web3d.html" class="btn">RETURN TO REALITY</a></div>
-<script type="module">
-  import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
-  const renderer = new THREE.WebGLRenderer({canvas:document.getElementById('c'), powerPreference:"high-performance"});
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); renderer.setSize(innerWidth, innerHeight);
-  const scene = new THREE.Scene(); const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-  const mat = new THREE.ShaderMaterial({
-    uniforms: { u_time: {value:0}, u_res: {value:new THREE.Vector2(innerWidth, innerHeight)}, u_mouse: {value:new THREE.Vector2(0,0)} },
-    vertexShader: `void main(){ gl_Position = vec4(position, 1.0); }`,
-    fragmentShader: `
-      uniform float u_time; uniform vec2 u_res; uniform vec2 u_mouse;
-      void main(){
-        vec2 uv = (gl_FragCoord.xy - 0.5*u_res.xy)/u_res.y;
-        vec2 m = u_mouse;
-        float t = u_time * 0.5;
-        
-        // Fractal math (Mandelbox logic simplified)
-        vec3 p = vec3(uv * 2.0, t);
-        for(int i=0; i<4; i++){
-          p = abs(p) / dot(p,p) - vec3(0.5);
-        }
-        
-        float intensity = length(p);
-        vec3 col = vec3(sin(intensity*10.0), cos(intensity*12.0), sin(intensity*15.0));
-        col *= exp(-length(uv)*2.0); // Vignette
-        
-        // Extreme aberration on mouse move
-        col.r += sin(intensity*10.0 + m.x*10.0)*0.5;
-        col.b += cos(intensity*15.0 + m.y*10.0)*0.5;
-        
-        gl_FragColor = vec4(abs(col), 1.0);
-      }
-    `
+<div id="hud">
+  <h1 class="title">OMNIPRESENCE</h1>
+  <a href="../web3d.html" class="back-btn">ASCEND</a>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script>
+  const s = new THREE.Scene();
+  const c = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.1, 1000); c.position.z = 20;
+  const r = new THREE.WebGLRenderer({canvas:document.getElementById('c'), antialias:true});
+  r.setPixelRatio(Math.min(window.devicePixelRatio, 2)); r.setSize(innerWidth, innerHeight);
+
+  // Fractal DNA (Abstract Geometry)
+  const knot = new THREE.Mesh(new THREE.TorusKnotGeometry(8, 2, 200, 32), new THREE.MeshBasicMaterial({color:0xffffff, wireframe:true, transparent:true, opacity:0.15})); s.add(knot);
+
+  let mx=0, my=0; window.addEventListener('mousemove', e=>{
+    mx=(e.clientX/innerWidth-0.5)*2; my=-(e.clientY/innerHeight-0.5)*2;
+    gsap.to('#cur', {x:e.clientX, y:e.clientY, duration:0.1});
   });
-  scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2), mat));
-  let mx=0, my=0; window.addEventListener('mousemove', e=>{ mx=e.clientX/innerWidth-0.5; my=-(e.clientY/innerHeight-0.5); });
-  window.addEventListener('resize', ()=>{ renderer.setSize(innerWidth, innerHeight); mat.uniforms.u_res.value.set(innerWidth,innerHeight); });
+
   function anim(t){
     requestAnimationFrame(anim);
-    mat.uniforms.u_time.value = t*0.001;
-    mat.uniforms.u_mouse.value.x += (mx - mat.uniforms.u_mouse.value.x)*0.1;
-    mat.uniforms.u_mouse.value.y += (my - mat.uniforms.u_mouse.value.y)*0.1;
-    renderer.render(scene, camera);
+    const time = t*0.0005;
+    knot.rotation.x = time; knot.rotation.y = time*1.2;
+    knot.scale.setScalar(1 + Math.sin(time*5)*0.1);
+    c.position.x += (mx*10 - c.position.x)*0.05; c.position.y += (my*10 - c.position.y)*0.05; c.lookAt(0,0,0);
+    r.render(s, c);
   } anim(0);
 </script>
 </body>

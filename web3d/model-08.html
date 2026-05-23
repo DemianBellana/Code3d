@@ -1,51 +1,71 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>FUTURE CITY // OMEGA.08</title>
+<title>SYNTHETIC MEGACITY // OMEGA.08</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
-  body { margin:0; overflow:hidden; background:#000; cursor:none; font-family:sans-serif; }
-  canvas { display:block; }
-  #hud { position:fixed; inset:0; pointer-events:none; z-index:10; box-shadow:inset 0 0 100px rgba(255,0,0,0.5); }
-  .btn { position:absolute; top:20px; left:20px; padding:10px 20px; background:rgba(255,0,0,0.3); border:1px solid #f00; color:#f00; text-decoration:none; font-weight:bold; letter-spacing:2px; pointer-events:all; transition:0.3s; }
-  .btn:hover { background:#f00; color:#000; box-shadow:0 0 20px #f00; }
-  .target { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:50px; height:50px; border:2px solid #f00; border-radius:50%; pointer-events:none; }
+  :root { --red: #ff3c3c; --bg: #03040a; --glass: rgba(255, 60, 60, 0.02); --border: rgba(255, 60, 60, 0.2); }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; background: var(--bg); color: #fff; overflow: hidden; font-family: 'Rajdhani', sans-serif; cursor: none; }
+  canvas { position: fixed; inset: 0; z-index: 0; }
+  #hud { position: fixed; inset: 0; z-index: 10; pointer-events: none; padding: 3rem; display: flex; flex-direction: column; justify-content: space-between; }
+  .hud-tag { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.3em; color: var(--red); background: rgba(255,60,60,0.05); padding: 0.5rem 1rem; border: 1px solid var(--border); backdrop-filter: blur(10px); }
+  .scene-info { position: absolute; bottom: 8vw; left: 3rem; max-width: 600px; padding: 2rem; background: rgba(0,0,0,0.6); backdrop-filter: blur(20px); border-top: 2px solid var(--red); pointer-events: all; }
+  .scene-num { font-family: 'Orbitron', sans-serif; font-size: 0.9rem; color: var(--red); letter-spacing: 0.5em; margin-bottom: 1rem; display: block; }
+  .scene-title { font-family: 'Orbitron', sans-serif; font-size: 2.5rem; font-weight: 900; text-transform: uppercase; margin-bottom: 1rem; }
+  .scene-desc { font-size: 1rem; color: rgba(255,255,255,0.5); }
+  .back-btn { pointer-events: all; text-decoration: none; color: #fff; font-family: 'Orbitron', sans-serif; font-size: 0.7rem; letter-spacing: 0.3em; padding: 1rem 2rem; border: 1px solid var(--border); background: var(--glass); backdrop-filter: blur(20px); border-radius: 4px; transition: all 0.4s; }
+  .back-btn:hover { background: var(--red); color: #000; }
+  #cur { position: fixed; width: 8px; height: 8px; background: var(--red); border-radius: 50%; pointer-events: none; z-index: 10000; transform: translate(-50%,-50%); }
+  #cur-ring { position: fixed; width: 40px; height: 40px; border: 1px solid var(--border); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: all 0.3s; }
 </style>
 </head>
 <body>
+<div id="cur"></div>
+<div id="cur-ring"></div>
 <canvas id="c"></canvas>
-<div id="hud"><a href="../web3d.html" class="btn">EVACUATE</a><div class="target"></div></div>
-<script type="module">
-  import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
-  const renderer = new THREE.WebGLRenderer({canvas:document.getElementById('c')});
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); renderer.setSize(innerWidth, innerHeight);
-  const scene = new THREE.Scene(); scene.fog = new THREE.FogExp2(0x0a0000, 0.05);
-  const camera = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 100); camera.position.set(0, 10, 20);
-  
-  // City
-  const geo = new THREE.BoxGeometry(1, 1, 1);
-  const mat = new THREE.MeshBasicMaterial({color:0x220000, wireframe:true});
-  const imesh = new THREE.InstancedMesh(geo, mat, 500);
-  const dummy = new THREE.Object3D();
-  for(let i=0; i<500; i++){
-    const h = 2 + Math.random()*15;
-    dummy.position.set((Math.random()-0.5)*100, h/2 - 5, (Math.random()-0.5)*100);
-    dummy.scale.set(1.5, h, 1.5); dummy.updateMatrix();
-    imesh.setMatrixAt(i, dummy.matrix);
-  }
-  scene.add(imesh);
+<div id="hud">
+  <header class="hud-header"><div class="hud-tag">ID // SECTOR_8_SYNTHETIC</div></header>
+  <div class="scene-info">
+    <span class="scene-num">MODULE 08</span>
+    <h1 class="scene-title">SYNTHETIC<br>MEGACITY</h1>
+    <p class="scene-desc">Arquitectura generativa masiva. Una ciudad instanciada que emerge de los algoritmos de construcción de la IA.</p>
+  </div>
+  <footer class="hud-footer"><a href="../web3d.html" class="back-btn">EVACUAR SECTOR</a></footer>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script>
+  const s = new THREE.Scene(); s.fog = new THREE.FogExp2(0x03040a, 0.04);
+  const c = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 500); c.position.set(0, 15, 40);
+  const r = new THREE.WebGLRenderer({canvas:document.getElementById('c'), antialias:true});
+  r.setPixelRatio(Math.min(window.devicePixelRatio, 2)); r.setSize(innerWidth, innerHeight);
 
-  let mx=0, my=0; window.addEventListener('mousemove', e=>{ mx=e.clientX/innerWidth-0.5; my=-(e.clientY/innerHeight-0.5); });
-  window.addEventListener('resize', ()=>{ camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth,innerHeight); });
+  // City DNA (Instanced)
+  const count = 800; const geo = new THREE.BoxGeometry(2, 1, 2);
+  const mat = new THREE.MeshStandardMaterial({color:0x222222, roughness:0.8, metalness:0.2});
+  const imesh = new THREE.InstancedMesh(geo, mat, count);
+  const dummy = new THREE.Object3D();
+  for(let i=0; i<count; i++){
+    const h = 2 + Math.random()*25;
+    dummy.position.set((Math.random()-0.5)*150, h/2 - 10, (Math.random()-0.5)*150);
+    dummy.scale.set(1.5, h, 1.5); dummy.updateMatrix(); imesh.setMatrixAt(i, dummy.matrix);
+  }
+  s.add(imesh);
+
+  const l1 = new THREE.PointLight(0xff3c3c, 6, 100); l1.position.set(0, 20, 0); s.add(l1);
+  s.add(new THREE.AmbientLight(0xffffff, 0.1));
+
+  let mx=0, my=0; window.addEventListener('mousemove', e=>{
+    mx=(e.clientX/innerWidth-0.5)*2; my=-(e.clientY/innerHeight-0.5)*2;
+    gsap.to('#cur', {x:e.clientX, y:e.clientY, duration:0.1}); gsap.to('#cur-ring', {x:e.clientX, y:e.clientY, duration:0.4});
+  });
 
   function anim(t){
     requestAnimationFrame(anim);
-    camera.position.z -= 0.1; // fly forward
-    if(camera.position.z < -20) camera.position.z = 20;
-    camera.position.x += (mx*10 - camera.position.x)*0.05;
-    camera.position.y += (10 + my*10 - camera.position.y)*0.05;
-    camera.lookAt(0, 5, camera.position.z - 20);
-    renderer.render(scene, camera);
+    c.position.x += (mx*20 - c.position.x)*0.03; c.position.y += (15 + my*10 - c.position.y)*0.03;
+    c.lookAt(0, 5, 0); r.render(s, c);
   } anim(0);
 </script>
 </body>

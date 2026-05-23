@@ -1,68 +1,76 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>MATRIX NET // OMEGA.06</title>
+<title>FORBIDDEN NET // OMEGA.06</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
 <style>
-  body { margin:0; overflow:hidden; background:#000; cursor:none; font-family:monospace; }
-  canvas { display:block; }
-  #hud { position:fixed; inset:0; pointer-events:none; z-index:10; color:#0f0; padding:20px; text-shadow:0 0 5px #0f0; }
-  .btn { position:absolute; bottom:20px; right:20px; padding:10px 20px; border:1px solid #0f0; color:#0f0; text-decoration:none; pointer-events:all; transition:0.2s; background:rgba(0,255,0,0.1); }
-  .btn:hover { background:#0f0; color:#000; box-shadow:0 0 20px #0f0; }
+  :root { --green: #00ff00; --bg: #03040a; --glass: rgba(0, 255, 0, 0.02); --border: rgba(0, 255, 0, 0.2); }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; background: var(--bg); color: #fff; overflow: hidden; font-family: 'Rajdhani', sans-serif; cursor: none; }
+  canvas { position: fixed; inset: 0; z-index: 0; }
+  #hud { position: fixed; inset: 0; z-index: 10; pointer-events: none; padding: 3rem; display: flex; flex-direction: column; justify-content: space-between; }
+  .hud-tag { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.3em; color: var(--green); background: rgba(0,255,0,0.05); padding: 0.5rem 1rem; border: 1px solid var(--border); backdrop-filter: blur(10px); }
+  .scene-info { position: absolute; top: 50%; left: 8vw; transform: translateY(-50%); max-width: 500px; }
+  .scene-num { font-family: 'Orbitron', sans-serif; font-size: 0.9rem; color: var(--green); letter-spacing: 0.5em; margin-bottom: 1.5rem; display: block; opacity: 0.6; }
+  .scene-title { font-family: 'Orbitron', sans-serif; font-size: clamp(2rem, 5vw, 4.5rem); font-weight: 900; line-height: 0.9; text-transform: uppercase; margin-bottom: 1.5rem; letter-spacing: -1px; }
+  .scene-desc { font-size: 1.1rem; font-weight: 300; line-height: 1.6; color: rgba(255,255,255,0.5); border-left: 2px solid var(--green); padding-left: 1.5rem; }
+  .back-btn { pointer-events: all; text-decoration: none; color: #fff; font-family: 'Orbitron', sans-serif; font-size: 0.7rem; letter-spacing: 0.3em; padding: 1rem 2rem; border: 1px solid var(--border); background: var(--glass); backdrop-filter: blur(20px); border-radius: 4px; transition: all 0.4s; }
+  .back-btn:hover { border-color: var(--green); color: var(--green); }
+  #cur { position: fixed; width: 8px; height: 8px; background: var(--green); border-radius: 50%; pointer-events: none; z-index: 10000; transform: translate(-50%,-50%); }
+  #cur-ring { position: fixed; width: 40px; height: 40px; border: 1px solid var(--border); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: all 0.3s; }
+  .scanline { position: fixed; inset: 0; z-index: 20; background: linear-gradient(to bottom, transparent 50%, rgba(0,255,0,0.02) 50%); background-size: 100% 4px; pointer-events: none; }
 </style>
 </head>
 <body>
+<div class="scanline"></div>
+<div id="cur"></div>
+<div id="cur-ring"></div>
 <canvas id="c"></canvas>
 <div id="hud">
-  <div>> ROOT ACCESS GRANTED</div>
-  <div id="hex"></div>
-  <a href="../web3d.html" class="btn">JACK OUT</a>
+  <header class="hud-header"><div class="hud-tag">ID // FORBIDDEN_LAYER_06</div></header>
+  <div class="scene-info">
+    <span class="scene-num">MODULE 06</span>
+    <h1 class="scene-title">FORBIDDEN<br>NETWORK</h1>
+    <p class="scene-desc">Sub-capas profundas del sistema. Donde los datos se fragmentan y la lógica de la IA entra en estados de entropía controlada.</p>
+  </div>
+  <footer class="hud-footer"><a href="../web3d.html" class="back-btn">EXIT TERMINAL</a></footer>
 </div>
-<script type="module">
-  import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
-  const renderer = new THREE.WebGLRenderer({canvas:document.getElementById('c')});
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); renderer.setSize(innerWidth, innerHeight);
-  const scene = new THREE.Scene(); const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-  const geo = new THREE.PlaneGeometry(2, 2);
-  const mat = new THREE.ShaderMaterial({
-    uniforms: { u_time: {value:0}, u_res: {value:new THREE.Vector2(innerWidth, innerHeight)} },
-    vertexShader: `void main(){ gl_Position = vec4(position, 1.0); }`,
-    fragmentShader: `
-      uniform float u_time; uniform vec2 u_res;
-      float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453123); }
-      void main(){
-        vec2 uv = gl_FragCoord.xy / u_res.xy;
-        uv.x *= u_res.x/u_res.y;
-        
-        // Digital Rain simplified
-        vec2 grid = floor(uv * 50.0);
-        vec2 fuv = fract(uv * 50.0);
-        
-        float drop = hash(grid + floor(u_time * 10.0));
-        float col = step(0.95, drop) * step(0.2, fuv.y);
-        
-        // Scanlines
-        col *= sin(gl_FragCoord.y * 2.0) * 0.2 + 0.8;
-        
-        // 3D perspective illusion grid
-        vec2 p = (gl_FragCoord.xy * 2.0 - u_res.xy) / u_res.y;
-        float z = 1.0 / abs(p.y + 0.1);
-        vec2 grid3d = vec2(p.x * z, z) * 10.0;
-        float mask = step(0.1, p.y + 0.1); // floor only
-        float lines = (step(0.9, fract(grid3d.x)) + step(0.9, fract(grid3d.y - u_time*5.0))) * mask;
-        
-        vec3 finalCol = vec3(0.0, 1.0, 0.2) * (col + lines*exp(-z*0.1));
-        gl_FragColor = vec4(finalCol, 1.0);
-      }
-    `
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script>
+  const s = new THREE.Scene(); s.fog = new THREE.FogExp2(0x03040a, 0.05);
+  const c = new THREE.PerspectiveCamera(60, innerWidth/innerHeight, 0.1, 200); c.position.set(0, 5, 20);
+  const r = new THREE.WebGLRenderer({canvas:document.getElementById('c'), antialias:true});
+  r.setPixelRatio(Math.min(window.devicePixelRatio, 2)); r.setSize(innerWidth, innerHeight);
+
+  // Glitch Grid DNA
+  const geo = new THREE.PlaneGeometry(100, 100, 40, 40); geo.rotateX(-Math.PI/2);
+  const mat = new THREE.MeshBasicMaterial({color:0x00ff00, wireframe:true, transparent:true, opacity:0.2});
+  const grid = new THREE.Mesh(geo, mat); grid.position.y = -10; s.add(grid);
+
+  const pCount = 5000; const pPos = new Float32Array(pCount*3);
+  for(let i=0;i<pCount;i++){ pPos[i*3]=(Math.random()-0.5)*100; pPos[i*3+1]=Math.random()*40; pPos[i*3+2]=(Math.random()-0.5)*100; }
+  const pGeo = new THREE.BufferGeometry(); pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+  const pMat = new THREE.PointsMaterial({color:0x00ff00, size:0.1, transparent:true, opacity:0.8});
+  const data = new THREE.Points(pGeo, pMat); s.add(data);
+
+  let mx=0, my=0; window.addEventListener('mousemove', e=>{
+    mx=(e.clientX/innerWidth-0.5)*2; my=-(e.clientY/innerHeight-0.5)*2;
+    gsap.to('#cur', {x:e.clientX, y:e.clientY, duration:0.1}); gsap.to('#cur-ring', {x:e.clientX, y:e.clientY, duration:0.4});
   });
-  scene.add(new THREE.Mesh(geo, mat));
-  window.addEventListener('resize', ()=>{ renderer.setSize(innerWidth, innerHeight); mat.uniforms.u_res.value.set(innerWidth,innerHeight); });
+
   function anim(t){
     requestAnimationFrame(anim);
-    mat.uniforms.u_time.value = t*0.001;
-    document.getElementById('hex').innerText = Math.random().toString(16).toUpperCase();
-    renderer.render(scene, camera);
+    const time = t*0.001;
+    const pos = geo.attributes.position.array;
+    for(let i=0; i<pos.length; i+=3){ pos[i+1] = Math.sin(pos[i]*0.1 + time)*2 + Math.cos(pos[i+2]*0.1 + time)*2; }
+    geo.attributes.position.needsUpdate = true;
+    const rpos = pGeo.attributes.position.array;
+    for(let i=0; i<pCount; i++){ rpos[i*3+1] -= 0.4; if(rpos[i*3+1] < -10) rpos[i*3+1] = 40; }
+    pGeo.attributes.position.needsUpdate = true;
+    c.position.x += (mx*10 - c.position.x)*0.05; c.position.y += (5 + my*5 - c.position.y)*0.05; c.lookAt(0,0,0);
+    r.render(s, c);
   } anim(0);
 </script>
 </body>
