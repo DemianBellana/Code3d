@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>CodeNoFrontier — Software sin límites</title>
   
   <!-- Open Graph / Social Media -->
@@ -43,13 +43,14 @@
       font-family: 'Outfit', sans-serif;
       overflow-x: hidden;
       cursor: none;
+      -webkit-tap-highlight-color: transparent;
     }
 
     /* CURSOR */
     #cursor {
       position: fixed; width: 10px; height: 10px;
       background: var(--accent); border-radius: 50%;
-      pointer-events: none; z-index: 9999;
+      pointer-events: none; z-index: 10000;
       transform: translate(-50%,-50%);
       mix-blend-mode: screen;
       transition: background 0.3s;
@@ -57,7 +58,7 @@
     #cursor-ring {
       position: fixed; width: 38px; height: 38px;
       border: 1px solid rgba(255,60,60,0.4); border-radius: 50%;
-      pointer-events: none; z-index: 9998;
+      pointer-events: none; z-index: 9999;
       transform: translate(-50%,-50%);
       transition: width 0.2s, height 0.2s, border-color 0.3s;
     }
@@ -65,42 +66,44 @@
     /* CANVAS */
     #bg-canvas {
       position: fixed; top: 0; left: 0;
-      width: 100%; height: 100%; z-index: 0;
+      width: 100%; height: 100%; z-index: -1;
     }
 
     /* ── NAV ── */
     nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 100;
       display: flex; align-items: center; justify-content: space-between;
-      padding: 1.4rem 3rem;
-      background: linear-gradient(to bottom, rgba(4,5,10,0.95), transparent);
-      backdrop-filter: blur(4px);
+      padding: 1.8rem 4vw;
+      background: linear-gradient(to bottom, rgba(4,5,10,0.98), transparent);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.03);
     }
     .logo {
       font-family: 'Bebas Neue', sans-serif;
-      font-size: 1.45rem; letter-spacing: 0.12em;
+      font-size: 1.5rem; letter-spacing: 0.15em;
       color: var(--text); text-decoration: none;
       display: flex; align-items: center; gap: 0;
     }
     .logo .code { color: var(--accent); }
     .logo .no   { color: var(--text); }
     .logo .frontier { color: var(--accent2); }
-    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links { display: flex; gap: 3rem; list-style: none; }
     .nav-links a {
-      color: var(--muted); text-decoration: none; font-size: 0.8rem;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      font-family: 'DM Mono', monospace; transition: color 0.2s;
+      color: var(--muted); text-decoration: none; font-size: 0.75rem;
+      letter-spacing: 0.25em; text-transform: uppercase;
+      font-family: 'DM Mono', monospace; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .nav-links a:hover { color: var(--text); }
+    .nav-links a:hover { color: var(--text); letter-spacing: 0.3em; }
     .nav-cta {
-      font-family: 'DM Mono', monospace; font-size: 0.75rem;
-      letter-spacing: 0.1em; text-transform: uppercase;
-      padding: 0.6rem 1.4rem;
-      border: 1px solid var(--accent);
-      color: var(--accent); background: transparent;
-      cursor: none; border-radius: 2px; transition: all 0.25s;
+      font-family: 'DM Mono', monospace; font-size: 0.7rem;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      padding: 0.7rem 1.6rem;
+      border: 1px solid rgba(255, 60, 60, 0.3);
+      color: var(--text); background: rgba(255, 60, 60, 0.05);
+      cursor: none; border-radius: 2px; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      backdrop-filter: blur(10px);
     }
-    .nav-cta:hover { background: var(--accent); color: #fff; }
+    .nav-cta:hover { background: var(--accent); border-color: var(--accent); color: #fff; box-shadow: 0 0 30px rgba(255, 60, 60, 0.3); }
 
     /* HAMBURGER */
     .hamburger {
@@ -1423,6 +1426,11 @@
     const renderer = new THREE.WebGLRenderer({ canvas, alpha:true, antialias:true });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
     renderer.setSize(window.innerWidth, window.innerHeight);
+    
+    // VISUAL UPGRADE
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.15;
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000);

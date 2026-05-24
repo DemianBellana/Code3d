@@ -37,19 +37,20 @@
   nav {
     position: fixed; top: 0; left: 0; right: 0; z-index: 100;
     display: flex; align-items: center; justify-content: space-between;
-    padding: 1.8rem 4vw; backdrop-filter: blur(10px);
+    padding: 2.2rem 4vw; backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,0.03);
   }
   .logo {
-    font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 0.1em;
+    font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 0.15em;
     color: #fff; text-decoration: none; display: flex; align-items: center;
   }
   .logo span { color: var(--accent); }
-  .nav-links { display: flex; gap: 3rem; list-style: none; }
+  .nav-links { display: flex; gap: 3.5rem; list-style: none; }
   .nav-links a {
-    color: var(--muted); text-decoration: none; font-size: 0.75rem;
-    letter-spacing: 0.2em; text-transform: uppercase; transition: color 0.4s;
+    color: var(--muted); text-decoration: none; font-size: 0.7rem;
+    letter-spacing: 0.3em; text-transform: uppercase; transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .nav-links a:hover { color: #fff; }
+  .nav-links a:hover { color: #fff; letter-spacing: 0.35em; }
 
   /* ─── HANGAR SLIDER (UI ORIGINAL RESTAURADA) ─── */
   .hangar-container { position: absolute; inset: 0; z-index: 10; display: flex; align-items: center; justify-content: center; perspective: 2000px; }
@@ -57,43 +58,46 @@
   
   .card {
     position: absolute; width: 420px; height: 580px;
-    background: var(--glass); border: 1px solid var(--border); border-radius: 20px;
+    background: rgba(10, 12, 20, 0.4); border: 1px solid rgba(255,255,255,0.05); border-radius: 24px;
     display: flex; flex-direction: column; overflow: hidden;
-    transform-origin: center center; transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s, border-color 0.4s;
-    backdrop-filter: blur(40px) saturate(140%); -webkit-backdrop-filter: blur(40px) saturate(140%);
+    transform-origin: center center; transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 1.2s, border-color 0.6s;
+    backdrop-filter: blur(50px) saturate(160%); -webkit-backdrop-filter: blur(50px) saturate(160%);
     pointer-events: none; opacity: 0; text-decoration: none; cursor: none;
-    box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+    box-shadow: 0 40px 100px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,255,255,0.02);
   }
   
-  .card.active { pointer-events: all; opacity: 1; border-color: rgba(255,255,255,0.15); box-shadow: 0 50px 120px rgba(0,0,0,0.9), 0 0 40px rgba(255,60,60,0.05); }
-  .card.prev, .card.next { opacity: 0.15; pointer-events: all; }
+  .card.active { pointer-events: all; opacity: 1; border-color: rgba(255,255,255,0.12); box-shadow: 0 50px 120px rgba(0,0,0,0.9), 0 0 60px rgba(255,60,60,0.03); }
+  .card.prev, .card.next { opacity: 0.1; pointer-events: all; }
   
   /* Portal Viewport (Previews Originales) */
   .portal-view { position: relative; width: 100%; height: 60%; background: #000; overflow: hidden; border-bottom: 1px solid rgba(255,255,255,0.03); }
   .portal-view::after { content:''; position:absolute; inset:0; background:linear-gradient(to top, rgba(4,6,13,1), transparent 30%); pointer-events:none; }
 
-  .card-info { padding: 2.5rem; flex: 1; display: flex; flex-direction: column; justify-content: space-between; background: linear-gradient(to bottom, transparent 0%, rgba(4,6,13,0.8) 100%); }
-  .card-id { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--accent2); letter-spacing: 0.4em; }
-  .card-title { font-family: 'Bebas Neue', sans-serif; font-size: 3rem; font-weight: 400; line-height: 0.9; color: #fff; margin: 0.8rem 0; letter-spacing: 0.02em; }
-  .card-desc { font-family: 'Outfit', sans-serif; font-size: 0.95rem; color: var(--muted); line-height: 1.6; font-weight: 300; }
+  .card-info { padding: 3rem; flex: 1; display: flex; flex-direction: column; justify-content: space-between; background: linear-gradient(to bottom, transparent 0%, rgba(4,6,13,0.8) 100%); }
+  .card-id { font-family: 'DM Mono', monospace; font-size: 0.6rem; color: var(--accent2); letter-spacing: 0.5em; opacity: 0.8; }
+  .card-title { font-family: 'Bebas Neue', sans-serif; font-size: 3.2rem; font-weight: 400; line-height: 0.85; color: #fff; margin: 1rem 0; letter-spacing: 0.04em; }
+  .card-desc { font-family: 'Outfit', sans-serif; font-size: 0.9rem; color: var(--muted); line-height: 1.8; font-weight: 300; letter-spacing: 0.02em; }
   
   .btn-enter { 
-    align-self: flex-start; margin-top: 1.5rem; padding: 1rem 2rem; 
-    background: var(--accent); color: #fff; border: none; 
-    font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; 
-    letter-spacing: 0.1em; border-radius: 4px; transition: all 0.4s;
-    box-shadow: 0 10px 30px rgba(255, 60, 60, 0.3);
+    align-self: flex-start; margin-top: 2rem; padding: 1.1rem 2.2rem; 
+    background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.2); 
+    font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; 
+    letter-spacing: 0.2em; border-radius: 4px; transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    position: relative; overflow: hidden;
   }
-  .card.active:hover .btn-enter { transform: translateX(10px) scale(1.05); box-shadow: 0 15px 40px rgba(255, 60, 60, 0.5); }
+  .btn-enter::before { content: ''; position: absolute; inset: 0; background: var(--accent); transform: scaleX(0); transform-origin: right; transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1); z-index: -1; }
+  .card.active:hover .btn-enter { color: #fff; border-color: var(--accent); box-shadow: 0 15px 40px rgba(255, 60, 60, 0.3); }
+  .card.active:hover .btn-enter::before { transform: scaleX(1); transform-origin: left; }
 
   /* ─── CURSOR ADN SERVICIOS ─── */
-  #cursor { position: fixed; width: 8px; height: 8px; background: #fff; border-radius: 50%; pointer-events: none; z-index: 10000; transform: translate(-50%,-50%); mix-blend-mode: difference; }
-  #cursor-ring { position: fixed; width: 38px; height: 38px; border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width 0.3s, height 0.3s, border-color 0.3s; }
+  #cursor { position: fixed; width: 6px; height: 6px; background: #fff; border-radius: 50%; pointer-events: none; z-index: 10000; transform: translate(-50%,-50%); mix-blend-mode: difference; }
+  #cursor-ring { position: fixed; width: 44px; height: 44px; border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), height 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s; }
 
   /* ─── FOOTER HUD ─── */
-  .footer-hud { position: absolute; bottom: 0; left: 0; right: 0; padding: 3rem 4vw; z-index: 100; display: flex; justify-content: space-between; align-items: flex-end; pointer-events: none; }
-  .status-line { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--muted); letter-spacing: 0.3em; text-transform: uppercase; }
-  .status-line span { color: var(--accent2); }
+  .footer-hud { position: absolute; bottom: 0; left: 0; right: 0; padding: 3.5rem 4vw; z-index: 100; display: flex; justify-content: space-between; align-items: flex-end; pointer-events: none; }
+  .status-line { font-family: 'DM Mono', monospace; font-size: 0.6rem; color: rgba(255, 255, 255, 0.6); letter-spacing: 0.4em; text-transform: uppercase; text-shadow: 0 0 5px rgba(0,0,0,0.5); }
+  .status-line span { color: var(--accent2); text-shadow: 0 0 10px rgba(0,255,224,0.5), 0 0 5px rgba(0,0,0,0.5); }
 
   @media(max-width:768px){
     .card { width: 88vw; height: 75vh; }
@@ -134,21 +138,20 @@
 </div>
 
 <!-- HONKFLOW INTEGRATION HUD -->
-<div style="position:fixed; top:50%; left:4vw; transform:translateY(-50%); z-index:100; pointer-events:none;">
-  <div style="font-family:'DM Mono', monospace; font-size:9px; color:var(--accent2); letter-spacing:4px; margin-bottom:20px; opacity:0.6;">SDD_ORCHESTRATOR // ACTIVE</div>
-  <div style="border-left:1px solid rgba(0,255,224,0.2); padding-left:15px; display:flex; flex-direction:column; gap:10px;">
-    <div style="font-family:'DM Mono'; font-size:8px; color:rgba(255,255,255,0.2); text-transform:uppercase;">Explore</div>
-    <div style="font-family:'DM Mono'; font-size:8px; color:rgba(255,255,255,0.2); text-transform:uppercase;">Propose</div>
-    <div style="font-family:'DM Mono'; font-size:8px; color:rgba(255,255,255,0.2); text-transform:uppercase;">Spec</div>
-    <div style="font-family:'DM Mono'; font-size:8px; color:rgba(255,255,255,0.2); text-transform:uppercase;">Design</div>
-    <div style="font-family:'DM Mono'; font-size:8px; color:#fff; text-transform:uppercase; text-shadow:0 0 10px var(--accent2);">Apply</div>
-    <div style="font-family:'DM Mono'; font-size:8px; color:rgba(255,255,255,0.2); text-transform:uppercase;">Verify</div>
+<div style="position:fixed; top:50%; left:4vw; transform:translateY(-50%); z-index:10001; pointer-events:none;">
+  <div style="font-family:'DM Mono', monospace; font-size:9px; color:var(--accent2); letter-spacing:4px; margin-bottom:20px; opacity:0.8; text-shadow:0 0 10px var(--accent2);">SDD_ORCHESTRATOR // ACTIVE</div>
+  <div style="border-left:1px solid rgba(0,255,224,0.3); padding-left:15px; display:flex; flex-direction:column; gap:12px;">
+    <div style="font-family:'DM Mono'; font-size:8px; color:rgba(255,255,255,0.4); text-transform:uppercase;">Explore [DONE]</div>
+    <div style="font-family:'DM Mono'; font-size:8px; color:rgba(255,255,255,0.4); text-transform:uppercase;">Design [DONE]</div>
+    <div style="font-family:'DM Mono'; font-size:8px; color:rgba(255,255,255,0.4); text-transform:uppercase;">Apply [DONE]</div>
+    <div style="font-family:'DM Mono'; font-size:8px; color:#fff; text-transform:uppercase; text-shadow:0 0 10px var(--accent2);">Verify [PASS]</div>
     <div style="font-family:'DM Mono'; font-size:8px; color:rgba(255,255,255,0.2); text-transform:uppercase;">Archive</div>
   </div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <script type="module">
   import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
+  import { VisualUpgrader } from './web3d/visual-upgrader.js';
 
   const models = [
     { id: '01', title: 'NEURAL AI', desc: 'Sincronización de sinapsis neuronales y núcleos de consciencia artificial.', type: 'neural', link: 'web3d/model-01.html' },
@@ -172,6 +175,8 @@
   const masterScene = new THREE.Scene();
   const hangarCamera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000);
   hangarCamera.position.z = 22;
+
+  const upgrader = new VisualUpgrader(renderer, masterScene, hangarCamera, { useBloom: true });
 
   // ─── BACKGROUND SHADER (ADN SERVICIOS) ───
   const bgMat = new THREE.ShaderMaterial({
@@ -272,7 +277,7 @@
          targetIndex = i;
          updateSlider();
       } else {
-         gsap.to(hangarCamera.position, { z: 4, duration: 1.5, ease: 'expo.inOut', onComplete: () => window.location.href = el.href });
+         gsap.to(hangarCamera.position, { z: 4, duration: 1.5, ease: 'expo.out', onComplete: () => window.location.href = el.href });
          gsap.to(el, { scale: 1.5, opacity: 0, duration: 1.2 });
       }
     });
@@ -341,7 +346,7 @@
     renderer.clear();
     
     // Render Master Scene (Background Shader)
-    renderer.render(masterScene, hangarCamera);
+    upgrader.render(t);
 
     // Render Portal Previews
     cards.forEach((card, i) => {
