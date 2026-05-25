@@ -1,0 +1,21 @@
+{
+  "feature_id": "20260524_05",
+  "feature_name": "rediseño_final_modelo_10",
+  "status": "completed",
+  "current_phase": "archive",
+  "current_phase_attempt": 1,
+  "started_at": "2026-05-24T16:45:00Z",
+  "completed_at": "2026-05-24T17:15:00Z",
+  "pipeline_flow": [
+    "explore",
+    "propose",
+    "spec",
+    "design",
+    "tasks",
+    "apply",
+    "verify",
+    "archive"
+  ],
+  "blocked_on": null,
+  "cwd_absoluto": "C:\\Users\\usuario 1\\code3.0 - copia"
+}

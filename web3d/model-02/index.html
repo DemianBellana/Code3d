@@ -2,134 +2,161 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ENTRY // CORPORATE QUANTUM EMPIRE</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<title>ENTRY // SYSTEM_CORE</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Outfit:wght@200;400;600&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/web3d/3d-style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
 <style>
-  :root { --c: #ffffff; --bg: #03040a; }
+  :root { --accent: #ffffff; --bg: #050505; }
   * { margin:0; padding:0; box-sizing:border-box; }
-  html, body { width: 100%; height: 100%; background:var(--bg); color:#fff; font-family:'Rajdhani', sans-serif; overflow:hidden; cursor:none; }
+  html, body { width: 100%; height: 100%; background:var(--bg); color:#fff; font-family:'Outfit', sans-serif; overflow:hidden; cursor:none; }
   canvas { position:fixed; inset:0; z-index:0; }
   
   #wipe { position:fixed; inset:0; background:var(--bg); z-index:9999; transform-origin:right; transform:scaleX(1); display:flex; align-items:center; justify-content:center; }
-  #wipe::after { content:''; position:absolute; width:100%; height:1px; background:var(--c); box-shadow:0 0 20px var(--c); transform:scaleX(0); animation:scan 1.5s ease-in-out forwards; }
+  #wipe::after { content:''; position:absolute; width:100%; height:1px; background:#fff; box-shadow:0 0 40px #fff; transform:scaleX(0); animation:scan 1.5s ease-in-out forwards; }
   @keyframes scan { 0%{transform:scaleX(0);} 50%{transform:scaleX(1);} 100%{transform:scaleX(0); opacity:0;} }
 
   #cur { position: fixed; width: 6px; height: 6px; background: #fff; border-radius: 50%; pointer-events: none; z-index: 10000; transform: translate(-50%,-50%); mix-blend-mode: difference; }
-  #cur-ring { position: fixed; width: 40px; height: 40px; border: 1px solid var(--c); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width 0.3s, height 0.3s; opacity:0.6; }
+  #cur-ring { position: fixed; width: 44px; height: 44px; border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width 0.4s, height 0.4s; }
   
   .vignette { position:fixed; inset:0; background:radial-gradient(circle at 50% 50%, transparent 20%, #000 150%); z-index:2; pointer-events:none; }
-  .scanlines { position:fixed; inset:0; background:linear-gradient(to bottom, transparent 50%, rgba(255,255,255,0.02) 50%); background-size:100% 4px; z-index:3; pointer-events:none; }
-  .noise { position: fixed; inset: 0; z-index: 4; pointer-events: none; opacity: 0.03; background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="n"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%" height="100%" filter="url(%23n)"/%3E%3C/svg%3E'); }
+  .scanlines { position:fixed; inset:0; background:linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.3) 50%); background-size:100% 4px; z-index:3; pointer-events:none; opacity: 0.1; }
 
   #hud { position:fixed; inset:0; z-index:10; pointer-events:none; padding:4vw; display:flex; flex-direction:column; justify-content:space-between; }
-  .tag { font-family:'DM Mono', monospace; font-size:9px; letter-spacing:6px; color:var(--c); text-transform:uppercase; opacity:0.7; }
+  .header-nav { display: flex; justify-content: space-between; align-items: flex-start; pointer-events: all; }
   
+  .scene-info { max-width: 600px; margin-top: 15vh; }
+  .tag-line { font-family:'DM Mono', monospace; font-size:10px; letter-spacing:6px; color:#fff; text-transform:uppercase; margin-bottom:1.5rem; opacity:0.6; }
+  .main-title { font-family:'Orbitron', sans-serif; font-size:clamp(3.5rem, 10vw, 8rem); font-weight:900; line-height:0.85; letter-spacing:-0.04em; text-transform:uppercase; margin-bottom:2rem; }
+  .sub-desc { font-size:1.1rem; font-weight:300; line-height:1.6; color:rgba(255,255,255,0.7); max-width:500px; margin-bottom:2.5rem; }
   
-  .content { position:absolute; top:50%; left:4vw; transform:translateY(-50%); }
-  .title { font-family:'Orbitron', sans-serif; font-size:clamp(4rem, 10vw, 9rem); font-weight:900; letter-spacing:-2px; margin:0; line-height:0.9; text-shadow:0 0 40px rgba(255,255,255,0.1); }
-  .act-lbl { font-family:'DM Mono', monospace; font-size:10px; color:var(--c); letter-spacing:5px; margin-bottom:20px; display:block; }
-  
+  .footer-meta { display: flex; justify-content: space-between; align-items: flex-end; }
+  .layer-info { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 4px; opacity: 0.5; text-transform: uppercase; }
 
-  .btn-next { pointer-events:all; align-self:flex-end; padding:15px 30px; border:1px solid rgba(255,255,255,0.1); color:#fff; text-decoration:none; font-family:'Orbitron', sans-serif; font-size:9px; letter-spacing:4px; transition:all 0.4s; backdrop-filter:blur(20px); text-transform:uppercase; background:rgba(255,255,255,0.02); }
-  .btn-next:hover { background:var(--c); color:#000; box-shadow:0 0 30px var(--c); border-color:var(--c); padding-right:45px; }
-  .emotion { position:absolute; bottom:4vw; left:4vw; font-family:'DM Mono', monospace; font-size:9px; letter-spacing:10px; color:var(--c); opacity:0.3; text-transform:uppercase; }
-  
-  @media(max-width:768px) { #hud { padding:2rem; } .content { left:2rem; } .btn-next { align-self:center; width:100%; text-align:center; position:absolute; bottom:2rem; left:50%; transform:translateX(-50%); width:calc(100% - 4rem); } .emotion { display:none; } }
+  @media(max-width:768px) { 
+    #hud { padding:2rem; } 
+    .scene-info { margin-top: 10vh; }
+    .main-title { font-size: 4rem; }
+  }
 </style>
 </head>
 <body>
-<div id="wipe"></div><div class="vignette"></div><div class="scanlines"></div><div class="noise"></div>
+<div id="wipe"></div><div class="vignette"></div><div class="scanlines"></div>
 <div id="cur"></div><div id="cur-ring"></div>
 <canvas id="c"></canvas>
 
 <div id="hud">
-  <div class="tag">// OMEGA_SYS.02</div>
-  <div class="content">
-    
-    <span class="act-lbl">ACT 02 // ENTRY</span>
-    <h1 class="title">CORPORATE<br>QUANTUM EMPIRE</h1>
-    
+  <div class="header-nav">
+    <a href="/web3d.html" class="btn-back" style="padding:0.6rem 1.8rem; font-size:9px; border-radius:4px;">← HUB</a>
   </div>
-  <div class="emotion">Poder frío</div>
-  <a href="page-02.html" class="btn-next" id="nextBtn">DEEPER</a>
+  
+  <div class="scene-info">
+    <span class="tag-line">ACT 02 // CORE</span>
+    <h1 class="main-title">SYSTEM_CORE</h1>
+    <p class="sub-desc">Arquitectura de procesamiento cuántico estéril. Escalabilidad sin fricción para ecosistemas corporativos de alto rendimiento. Módulos estabilizados y listos para integración.</p>
+  </div>
+
+  <div class="footer-meta">
+    <div class="layer-info">LAYER 02 / 04</div>
+    <a href="/web3d/model-02/page-02.html" class="btn-next" id="nextBtn" style="pointer-events:all; color:#fff; text-decoration:none; font-family:'Orbitron', sans-serif; font-size:10px; letter-spacing:4px; padding:1rem 2.5rem; border:1px solid rgba(255,255,255,0.1); backdrop-filter:blur(20px);">DEEPER</a>
+  </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-
-<script type="x-shader/x-vertex" id="p-vert">
-  attribute float size; attribute float phase; varying float vAlpha; uniform float uTime;
-  void main() {
-    vec3 pos = position; float dist = length(pos);
-    float wave = sin(dist * 0.2 - uTime + phase) * 0.5 + 0.5;
-    pos += normalize(pos) * wave * 2.0;
-    vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
-    gl_PointSize = size * (300.0 / -mvPosition.z) * (0.5 + wave * 0.5);
-    gl_Position = projectionMatrix * mvPosition;
-    vAlpha = smoothstep(80.0, 10.0, dist) * (0.2 + wave * 0.4);
-  }
-</script>
-<script type="x-shader/x-fragment" id="p-frag">
-  varying float vAlpha; uniform vec3 uColor;
-  void main() {
-    float d = length(gl_PointCoord - 0.5); if (d > 0.5) discard;
-    gl_FragColor = vec4(uColor, vAlpha * (1.0 - d * 2.0));
-  }
+<script type="module">
+  import * as THREE from 'three';
+  window.THREE = THREE;
 </script>
 
-<script>
+<script type="module">
+  import { VisualUpgrader } from '/web3d/visual-upgrader.js';
   gsap.to('#wipe', {scaleX: 0, duration: 1.5, ease: 'expo.inOut', delay: 0.2});
-  document.getElementById('nextBtn').addEventListener('click', e => {
-    e.preventDefault();
-    gsap.to('#wipe', {scaleX: 1, duration: 1.2, ease: 'expo.inOut', transformOrigin: 'left', onComplete: () => window.location.href = e.currentTarget.href});
-  });
 
   let mx=0, my=0;
-  const cur = document.getElementById('cur'), ring = document.getElementById('cur-ring');
-  function updatePointer(x, y) { 
-    mx = (x / innerWidth - 0.5) * 2; my = -(y / innerHeight - 0.5) * 2; 
-    gsap.to(cur, {x: x, y: y, duration: 0.1});
-    gsap.to(ring, {x: x, y: y, duration: 0.4}); 
-  }
-  window.addEventListener('mousemove', e => updatePointer(e.clientX, e.clientY));
-  window.addEventListener('touchmove', e => updatePointer(e.touches[0].clientX, e.touches[0].clientY));
-  document.querySelectorAll('a').forEach(el => { 
-    el.addEventListener('mouseenter', () => gsap.to(ring, {width:60, height:60, borderColor:'#fff'})); 
-    el.addEventListener('mouseleave', () => gsap.to(ring, {width:40, height:40, borderColor:'var(--c)'})); 
+  window.addEventListener('mousemove', e => {
+    mx = (e.clientX / window.innerWidth - 0.5) * 2;
+    my = -(e.clientY / window.innerHeight - 0.5) * 2;
+    gsap.to('#cur', {x:e.clientX, y:e.clientY, duration:0.1});
+    gsap.to('#cur-ring', {x:e.clientX, y:e.clientY, duration:0.4}); 
   });
 
-  const s = new THREE.Scene(); s.fog = new THREE.FogExp2(0x03040a, 0.04);
-  const c = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 0.1, 1000); 
-  c.position.z = 35;
+  const s = new THREE.Scene(); s.fog = new THREE.FogExp2(0x050505, 0.03);
+  const c = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000); 
   const r = new THREE.WebGLRenderer({canvas:document.getElementById('c'), antialias:true, alpha:true});
-  r.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); r.setSize(innerWidth, innerHeight); r.toneMapping = THREE.ACESFilmicToneMapping;
+  r.setPixelRatio(Math.min(window.devicePixelRatio, 1.5)); r.setSize(innerWidth, innerHeight);
 
-  const pCount = 12000; const pPos = new Float32Array(pCount*3); const pSiz = new Float32Array(pCount); const pPhs = new Float32Array(pCount);
-  for(let i=0;i<pCount;i++){ pPos[i*3]=(Math.random()-0.5)*150; pPos[i*3+1]=(Math.random()-0.5)*150; pPos[i*3+2]=(Math.random()-0.5)*150; pSiz[i]=Math.random()*1.5; pPhs[i]=Math.random()*Math.PI*2; }
-  const pGeo = new THREE.BufferGeometry(); pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3)); pGeo.setAttribute('size', new THREE.BufferAttribute(pSiz, 1)); pGeo.setAttribute('phase', new THREE.BufferAttribute(pPhs, 1));
-  const pMat = new THREE.ShaderMaterial({ uniforms: { uTime: {value:0}, uColor: {value: new THREE.Color(0xffffff)} }, vertexShader: document.getElementById('p-vert').textContent, fragmentShader: document.getElementById('p-frag').textContent, transparent:true, blending:THREE.AdditiveBlending, depthWrite:false });
+  const vu = new VisualUpgrader(r, s, c);
+  window.vu = vu; 
+
+  // LUCES MAESTRAS
+  const l1 = new THREE.PointLight(0xffffff, 50, 100); l1.position.set(20, 20, 20); s.add(l1);
+  const l2 = new THREE.PointLight(0xffffff, 30, 100); l2.position.set(-20, -20, 20); s.add(l2);
+  s.add(new THREE.AmbientLight(0xffffff, 0.2));
+
+  // OBJETO: FROSTED CRYSTAL CORE
+  const mat = new THREE.MeshPhysicalMaterial({
+    color: 0xffffff,
+    metalness: 0.1,
+    roughness: 0.2,
+    transmission: 0.9,
+    thickness: 10,
+    ior: 1.45,
+    clearcoat: 1,
+    clearcoatRoughness: 0.1,
+    transparent: true,
+    opacity: 0.9,
+    emissive: 0xffffff,
+    emissiveIntensity: 0.1
+  });
+
+  const geo = new THREE.IcosahedronGeometry(12, 4);
+  const centralObj = new THREE.Mesh(geo, mat);
+  s.add(centralObj);
+
+  // PARTICLES (OPTIMIZADAS)
+  const pCount = 5000; const pPos = new Float32Array(pCount*3);
+  for(let i=0;i<pCount;i++){ pPos[i*3]=(Math.random()-0.5)*150; pPos[i*3+1]=(Math.random()-0.5)*150; pPos[i*3+2]=(Math.random()-0.5)*150; }
+  const pGeo = new THREE.BufferGeometry(); pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+  const pMat = new THREE.PointsMaterial({color:0xffffff, size:0.05, transparent:true, opacity:0.3, blending:THREE.AdditiveBlending});
   const particles = new THREE.Points(pGeo, pMat); s.add(particles);
 
-  const l1 = new THREE.PointLight(0xffffff, 2, 100); l1.position.set(10,15,10); s.add(l1);
-  const l2 = new THREE.PointLight(0xffffff, 1, 100); l2.position.set(-10,-15,10); s.add(l2);
-  s.add(new THREE.AmbientLight(0xffffff, 0.1));
+  function updateLayout() {
+    const aspect = window.innerWidth / window.innerHeight;
+    c.aspect = aspect;
+    c.updateProjectionMatrix();
+    r.setSize(window.innerWidth, window.innerHeight);
 
-  let centralObj, centralObj2;
-  centralObj = new THREE.Mesh(new THREE.IcosahedronGeometry(6,2), new THREE.MeshPhysicalMaterial({color:0xffffff, transmission:1, thickness:2.5, roughness:0.05, ior:1.5})); centralObj2 = new THREE.Mesh(new THREE.IcosahedronGeometry(2.5,1), new THREE.MeshBasicMaterial({color:0xffffff, wireframe:true, transparent:true, opacity:0.3}));
-  if(centralObj) s.add(centralObj); if(centralObj2) s.add(centralObj2);
+    if(aspect > 1) {
+      centralObj.position.set(8, 0, 0);
+      c.position.z = 40;
+    } else {
+      centralObj.position.set(0, 5, -10);
+      c.position.z = 50;
+    }
+  }
+  window.addEventListener('resize', updateLayout);
+  updateLayout();
 
   const clock = new THREE.Clock();
   function anim() { 
     requestAnimationFrame(anim); const t = clock.getElapsedTime();
-    pMat.uniforms.uTime.value = t; particles.rotation.y = t * 0.02;
-    if(centralObj){ centralObj.rotation.y = t*0.1; } if(centralObj2){ centralObj2.rotation.y = -t*0.2; }
+    centralObj.rotation.y = t * 0.1;
+    particles.rotation.y = t * 0.02;
 
-    c.position.x += (mx * 8 - c.position.x) * 0.05; c.position.y += (my * 8 - c.position.y) * 0.05; c.lookAt(0,0,0);
-    r.render(s, c);
+    c.position.x += (mx * 4 - c.position.x) * 0.05;
+    c.position.y += (my * 4 - c.position.y) * 0.05;
+    c.lookAt(centralObj.position);
+    
+    vu.render(t);
   } 
   anim();
-
-  window.addEventListener('resize', () => { c.aspect=innerWidth/innerHeight; c.updateProjectionMatrix(); r.setSize(innerWidth,innerHeight); });
 </script>
 </body>
 </html>

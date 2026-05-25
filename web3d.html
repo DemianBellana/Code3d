@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>CODE NO FRONTIER — Web3D Hub</title>
 <!-- TIPOGRAFÍA ADN MAESTRO -->
@@ -70,7 +78,7 @@
   .card.prev, .card.next { opacity: 0.1; pointer-events: all; }
   
   /* Portal Viewport (Previews Originales) */
-  .portal-view { position: relative; width: 100%; height: 60%; background: #000; overflow: hidden; border-bottom: 1px solid rgba(255,255,255,0.03); }
+  .portal-view { position: relative; width: 100%; height: 60%; background: transparent; overflow: hidden; border-bottom: 1px solid rgba(255,255,255,0.03); }
   .portal-view::after { content:''; position:absolute; inset:0; background:linear-gradient(to top, rgba(4,6,13,1), transparent 30%); pointer-events:none; }
 
   .card-info { padding: 3rem; flex: 1; display: flex; flex-direction: column; justify-content: space-between; background: linear-gradient(to bottom, transparent 0%, rgba(4,6,13,0.8) 100%); }
@@ -137,33 +145,22 @@
   <div class="status-line">SWIPE / SCROLL DIMENSIONS</div>
 </div>
 
-<!-- HONKFLOW INTEGRATION HUD -->
-<div style="position:fixed; top:50%; left:4vw; transform:translateY(-50%); z-index:10001; pointer-events:none;">
-  <div style="font-family:'DM Mono', monospace; font-size:9px; color:var(--accent2); letter-spacing:4px; margin-bottom:20px; opacity:0.8; text-shadow:0 0 10px var(--accent2);">SDD_ORCHESTRATOR // ACTIVE</div>
-  <div style="border-left:1px solid rgba(0,255,224,0.3); padding-left:15px; display:flex; flex-direction:column; gap:12px;">
-    <div style="font-family:'DM Mono'; font-size:8px; color:rgba(255,255,255,0.4); text-transform:uppercase;">Explore [DONE]</div>
-    <div style="font-family:'DM Mono'; font-size:8px; color:rgba(255,255,255,0.4); text-transform:uppercase;">Design [DONE]</div>
-    <div style="font-family:'DM Mono'; font-size:8px; color:rgba(255,255,255,0.4); text-transform:uppercase;">Apply [DONE]</div>
-    <div style="font-family:'DM Mono'; font-size:8px; color:#fff; text-transform:uppercase; text-shadow:0 0 10px var(--accent2);">Verify [PASS]</div>
-    <div style="font-family:'DM Mono'; font-size:8px; color:rgba(255,255,255,0.2); text-transform:uppercase;">Archive</div>
-  </div>
-</div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <script type="module">
   import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
-  import { VisualUpgrader } from './web3d/visual-upgrader.js';
+  window.THREE = THREE;
+</script>
+<script type="module">
+  import { VisualUpgrader } from '/web3d/visual-upgrader.js';
 
   const models = [
-    { id: '01', title: 'NEURAL AI', desc: 'Sincronización de sinapsis neuronales y núcleos de consciencia artificial.', type: 'neural', link: 'web3d/model-01.html' },
-    { id: '02', title: 'CORPORATE CORE', desc: 'Arquitectura estéril de procesamiento masivo y protocolos corporativos.', type: 'crystal', link: 'web3d/model-02/index.html' },
-    { id: '03', title: 'COSMIC LAYER', desc: 'Simulación astrofísica de horizontes de sucesos y nubes galácticas.', type: 'galaxy', link: 'web3d/model-03/index.html' },
-    { id: '04', title: 'OPERATING SYS', desc: 'Capas operativas y flujos logísticos de datos en tiempo real.', type: 'rings', link: 'web3d/model-04/index.html' },
-    { id: '05', title: 'NEURAL CHAMBER', desc: 'Refinamiento estético y sensorial mediante metal líquido fractal.', type: 'liquid', link: 'web3d/model-05/index.html' },
-    { id: '06', title: 'FORBIDDEN NET', desc: 'Sub-capas de entropía controlada y redes de datos prohibidas.', type: 'grid', link: 'web3d/model-06/index.html' },
-    { id: '07', title: 'DIMENSIONAL GW', desc: 'Punto de enlace cuántico entre la consciencia y el multiverso.', type: 'portal', link: 'web3d/model-07/index.html' },
-    { id: '08', title: 'SYNTHETIC CITY', desc: 'Megaciudad generativa instanciada bajo cielos de datos rojos.', type: 'city', link: 'web3d/model-08/index.html' },
-    { id: '09', title: 'TACTICAL NEXUS', desc: 'Centro de comando táctico y visualización de amenazas globales.', type: 'globe', link: 'web3d/model-09/index.html' },
-    { id: '10', title: 'TRANSCENDENCE', desc: 'La evolución final. Singularidad alcanzada y omnipresencia digital.', type: 'fractal', link: 'web3d/model-10/index.html' }
+    { id: '01', title: 'NEURAL AI', desc: 'Sincronización de sinapsis neuronales y núcleos de consciencia artificial.', type: 'neural', link: '/web3d/model-01/index.html' },
+    { id: '02', title: 'CORPORATE CORE', desc: 'Arquitectura estéril de procesamiento masivo y protocolos corporativos.', type: 'crystal', link: '/web3d/model-02/index.html' },
+    { id: '03', title: 'COSMIC LAYER', desc: 'Simulación astrofísica de horizontes de sucesos y nubes galácticas.', type: 'galaxy', link: '/web3d/model-03/index.html' },
+    { id: '04', title: 'OPERATING SYS', desc: 'Capas operativas y flujos logísticos de datos en tiempo real.', type: 'rings', link: '/web3d/model-04/index.html' },
+    { id: '05', title: 'FORBIDDEN NET', desc: 'Sub-capas de entropía controlada y redes de datos prohibidas.', type: 'grid', link: '/web3d/model-05/index.html' },
+    { id: '06', title: 'DIMENSIONAL GW', desc: 'Punto de enlace cuántico entre la consciencia y el multiverso.', type: 'portal', link: '/web3d/model-06/index.html' },
+    { id: '07', title: 'TACTICAL NEXUS', desc: 'Centro de comando táctico y visualización de amenazas globales.', type: 'globe', link: '/web3d/model-07/index.html' }
   ];
 
   // ─── ENGINE SETUP ───
@@ -176,7 +173,7 @@
   const hangarCamera = new THREE.PerspectiveCamera(45, window.innerWidth/window.innerHeight, 0.1, 1000);
   hangarCamera.position.z = 22;
 
-  const upgrader = new VisualUpgrader(renderer, masterScene, hangarCamera, { useBloom: true });
+  const upgrader = new VisualUpgrader(renderer, masterScene, hangarCamera, { useBloom: false });
 
   // ─── BACKGROUND SHADER (ADN SERVICIOS) ───
   const bgMat = new THREE.ShaderMaterial({
@@ -224,29 +221,57 @@
   // ─── PORTAL PREVIEW ENGINE ───
   const portalScenes = models.map((m, i) => {
     const scene = new THREE.Scene();
+    // Luces globales para cada mini-escena (ADN SERVICIOS: Iluminación mejorada)
+    scene.add(new THREE.AmbientLight(0xffffff, 2.0));
+    const dl = new THREE.DirectionalLight(0xffffff, 2.5); 
+    dl.position.set(5, 5, 5); 
+    scene.add(dl);
+    
     let obj;
     if(m.type === 'neural') {
-       obj = new THREE.Points(new THREE.IcosahedronGeometry(4, 2), new THREE.PointsMaterial({color: 0x00f0ff, size: 0.1}));
+       obj = new THREE.Points(new THREE.IcosahedronGeometry(5, 2), new THREE.PointsMaterial({color: 0x00f0ff, size: 0.15, transparent: true, opacity: 0.8}));
     } else if(m.type === 'crystal') {
-       obj = new THREE.Mesh(new THREE.IcosahedronGeometry(4, 0), new THREE.MeshBasicMaterial({color: 0xffffff, wireframe: true}));
+       // Aumento de detalle y material más visible (HonkFlow: CA-002)
+       obj = new THREE.Mesh(new THREE.IcosahedronGeometry(4, 1), new THREE.MeshStandardMaterial({
+         color: 0xffffff, 
+         wireframe: true, 
+         emissive: 0x00ffe0, 
+         emissiveIntensity: 0.6,
+         metalness: 0.5,
+         roughness: 0.2
+       }));
     } else if(m.type === 'galaxy') {
-       obj = new THREE.Points(new THREE.SphereGeometry(4, 32, 32), new THREE.PointsMaterial({color: 0xa855f7, size: 0.05}));
+       obj = new THREE.Points(new THREE.SphereGeometry(4, 32, 32), new THREE.PointsMaterial({color: 0xa855f7, size: 0.1, transparent: true, opacity: 0.8}));
     } else if(m.type === 'rings') {
-       obj = new THREE.Mesh(new THREE.TorusGeometry(3, 0.1, 8, 50), new THREE.MeshBasicMaterial({color: 0x00f0ff, wireframe: true}));
+       obj = new THREE.Mesh(new THREE.TorusGeometry(3, 0.2, 16, 100), new THREE.MeshStandardMaterial({
+         color: 0x00f0ff, 
+         wireframe: true, 
+         emissive: 0x00f0ff,
+         emissiveIntensity: 0.4
+       }));
     } else if(m.type === 'liquid') {
        obj = new THREE.Mesh(new THREE.SphereGeometry(3.5, 32, 32), new THREE.MeshStandardMaterial({color: 0xc8a97a, metalness: 1, roughness: 0.1}));
-       const l = new THREE.PointLight(0xffffff, 2); l.position.set(5,5,5); scene.add(l);
     } else if(m.type === 'grid') {
-       obj = new THREE.Mesh(new THREE.PlaneGeometry(10, 10, 10, 10), new THREE.MeshBasicMaterial({color: 0x00ff00, wireframe: true}));
+       obj = new THREE.Mesh(new THREE.PlaneGeometry(12, 12, 12, 12), new THREE.MeshBasicMaterial({color: 0x00ff00, wireframe: true, transparent: true, opacity: 0.6}));
        obj.rotation.x = -Math.PI/2;
     } else if(m.type === 'portal') {
-       obj = new THREE.Mesh(new THREE.TorusGeometry(4, 0.5, 8, 50), new THREE.MeshBasicMaterial({color: 0xff00ff, wireframe: true}));
+       obj = new THREE.Mesh(new THREE.TorusGeometry(4, 0.5, 8, 50), new THREE.MeshStandardMaterial({
+         color: 0xff00ff, 
+         wireframe: true, 
+         emissive: 0xff00ff,
+         emissiveIntensity: 0.4
+       }));
     } else if(m.type === 'city') {
-       obj = new THREE.Mesh(new THREE.BoxGeometry(4, 4, 4), new THREE.MeshBasicMaterial({color: 0xff3c3c, wireframe: true}));
+       obj = new THREE.Mesh(new THREE.BoxGeometry(4, 4, 4), new THREE.MeshStandardMaterial({color: 0xff3c3c, wireframe: true}));
     } else if(m.type === 'globe') {
-       obj = new THREE.Mesh(new THREE.SphereGeometry(4, 16, 16), new THREE.MeshBasicMaterial({color: 0xff3c3c, wireframe: true}));
+       obj = new THREE.Mesh(new THREE.SphereGeometry(4, 16, 16), new THREE.MeshStandardMaterial({
+         color: 0xff3c3c, 
+         wireframe: true,
+         emissive: 0xff3c3c,
+         emissiveIntensity: 0.3
+       }));
     } else {
-       obj = new THREE.Mesh(new THREE.TorusKnotGeometry(3, 1, 100, 16), new THREE.MeshBasicMaterial({color: 0xffffff, wireframe: true}));
+       obj = new THREE.Mesh(new THREE.TorusKnotGeometry(3, 1, 100, 16), new THREE.MeshStandardMaterial({color: 0xffffff, wireframe: true}));
     }
     scene.add(obj);
     scene.userData.obj = obj;
@@ -324,6 +349,18 @@
     }
   });
 
+  // SOPORTE TÁCTIL (HonkFlow: CA-001)
+  let touchStartX = 0;
+  window.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; }, {passive: true});
+  window.addEventListener('touchend', e => {
+    const touchEndX = e.changedTouches[0].clientX;
+    const deltaX = touchStartX - touchEndX;
+    if (Math.abs(deltaX) > 50) {
+      targetIndex = Math.max(0, Math.min(models.length - 1, activeIndex + (deltaX > 0 ? 1 : -1)));
+      updateSlider();
+    }
+  }, {passive: true});
+
   let mx=0, my=0, cx=0, cy=0;
   window.addEventListener('mousemove', e => {
     mx=e.clientX; my=e.clientY;
@@ -349,9 +386,14 @@
     upgrader.render(t);
 
     // Render Portal Previews
+    renderer.autoClear = false; // Importante: No borrar el fondo al renderizar portales
     cards.forEach((card, i) => {
+      // Renderizar el activo y sus vecinos (prev/next) para que el diseño sea visible siempre.
       if (Math.abs(i - activeIndex) > 1) return;
-      const rect = document.getElementById(`portal-${i}`).getBoundingClientRect();
+
+      const portalDiv = document.getElementById(`portal-${i}`);
+      if (!portalDiv) return;
+      const rect = portalDiv.getBoundingClientRect();
       if (rect.bottom < 0 || rect.top > window.innerHeight) return;
 
       const width = rect.right - rect.left;

@@ -1,0 +1,19 @@
+{
+    "feature_id": "20260524_02_fix_model_nav_404",
+    "feature_name": "Fix Model Navigation 404",
+    "status": "completed",
+    "current_phase": "archive",
+    "current_phase_attempt": 1,
+    "started_at": "2026-05-24T19:35:00Z",
+    "completed_at": "2026-05-24T19:45:00Z",
+    "pipeline_flow": [
+        "explore",
+        "spec",
+        "design",
+        "tasks",
+        "apply",
+        "verify"
+    ],
+    "blocked_on": null,
+    "last_error": null
+}

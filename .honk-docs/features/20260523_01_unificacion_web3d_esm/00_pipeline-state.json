@@ -1,0 +1,27 @@
+{
+    "feature": "Unificación Total Web3D ESM",
+    "feature_id": "20260523_01_unificacion_web3d_esm",
+    "type": "infra",
+    "flow": ["explore", "design", "spec", "tasks", "apply", "verify", "archive"],
+    "current_phase": "archive",
+    "status": "completed",
+    "started_at": "2026-05-23T23:22:00Z",
+    "completed_at": "2026-05-24T15:00:00Z",
+    "history": [
+        {"phase": "explore", "status": "completed", "completed_at": "2026-05-24T10:00:00Z"},
+        {"phase": "design", "status": "completed", "completed_at": "2026-05-24T10:05:00Z"},
+        {"phase": "spec", "status": "completed", "completed_at": "2026-05-24T10:10:00Z"},
+        {"phase": "tasks", "status": "completed", "completed_at": "2026-05-24T10:15:00Z"},
+        {"phase": "apply", "status": "completed", "completed_at": "2026-05-24T11:00:00Z"},
+        {"phase": "verify", "status": "completed", "completed_at": "2026-05-24T14:15:00Z"},
+        {"phase": "archive", "status": "completed", "completed_at": "2026-05-24T15:00:00Z"}
+    ],
+    "artifacts": [
+        "01_explore.md",
+        "02_propose_spec.md",
+        "03_design_tasks.md",
+        "06_apply.md",
+        "07_verify.md",
+        "00_pipeline-log.md"
+    ]
+}

@@ -5,12 +5,12 @@
  * Stage D: Cinematic Atmosphere & Ambient Particles
  */
 
-import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
-import { EffectComposer } from 'https://unpkg.com/three@0.160.0/examples/jsm/postprocessing/EffectComposer.js';
-import { RenderPass } from 'https://unpkg.com/three@0.160.0/examples/jsm/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from 'https://unpkg.com/three@0.160.0/examples/jsm/postprocessing/UnrealBloomPass.js';
-import { OutputPass } from 'https://unpkg.com/three@0.160.0/examples/jsm/postprocessing/OutputPass.js';
-import { RGBELoader } from 'https://unpkg.com/three@0.160.0/examples/jsm/loaders/RGBELoader.js';
+import * as THREE from 'three';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 
 export class VisualUpgrader {
     constructor(renderer, scene, camera, options = {}) {
@@ -31,10 +31,14 @@ export class VisualUpgrader {
 
         this.composer = null;
         this.particles = null;
-        this.pmremGenerator = new THREE.PMREMGenerator(this.renderer);
-        this.pmremGenerator.compileEquirectangularShader();
         
-        this.init();
+        try {
+            this.pmremGenerator = new THREE.PMREMGenerator(this.renderer);
+            this.pmremGenerator.compileEquirectangularShader();
+            this.init();
+        } catch (e) {
+            console.error("HonkFlow Visual Upgrader: Initialization failed. Falling back to base renderer.", e);
+        }
     }
 
     init() {
@@ -43,13 +47,25 @@ export class VisualUpgrader {
         this.renderer.toneMappingExposure = this.options.exposure;
         this.renderer.outputColorSpace = THREE.SRGBColorSpace;
 
+        // Mobile Optimization (HonkFlow: CA-002)
+        const isMobile = window.innerWidth < 768;
+        if (isMobile) {
+            this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+            this.options.useBloom = false; // Disable bloom on mobile for performance
+        }
+
         // Ambient Lighting Refinement
-        this.scene.remove(this.scene.getObjectByName('honk_ambient'));
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.05);
+        const oldAmbient = this.scene.getObjectByName('honk_ambient');
+        if (oldAmbient) this.scene.remove(oldAmbient);
+        
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
         ambientLight.name = 'honk_ambient';
         this.scene.add(ambientLight);
 
-        const hemiLight = new THREE.HemisphereLight(0x00f0ff, 0xa855f7, 0.6);
+        const oldHemi = this.scene.getObjectByName('honk_hemi');
+        if (oldHemi) this.scene.remove(oldHemi);
+
+        const hemiLight = new THREE.HemisphereLight(0x00f0ff, 0xa855f7, 0.4);
         hemiLight.name = 'honk_hemi';
         this.scene.add(hemiLight);
 
@@ -60,11 +76,10 @@ export class VisualUpgrader {
         if (this.options.useAtmosphere) this.setupAtmosphere();
         if (this.options.useParticles) this.setupParticles();
         
-        console.log("HonkFlow Visual Upgrader: Cinematic Atmosphere Initialized.");
+        console.log("HonkFlow Visual Upgrader: Ready.");
     }
 
     setupAtmosphere() {
-        // Subtle depth fog for physical presence
         this.scene.fog = new THREE.FogExp2(0x03040a, 0.04);
     }
 
@@ -100,40 +115,42 @@ export class VisualUpgrader {
             const envMap = this.pmremGenerator.fromEquirectangular(texture).texture;
             this.scene.environment = envMap;
             texture.dispose();
-            console.log("HonkFlow Visual Upgrader: HDRI Loaded.");
         }, undefined, (err) => {
             console.warn("HonkFlow Visual Upgrader: HDRI Load Failed.", err);
         });
     }
 
     setupBloom() {
-        const renderScene = new RenderPass(this.scene, this.camera);
-        const bloomPass = new UnrealBloomPass(
-            new THREE.Vector2(window.innerWidth, window.innerHeight),
-            this.options.bloomStrength,
-            this.options.bloomRadius,
-            this.options.bloomThreshold
-        );
-        const outputPass = new OutputPass();
+        try {
+            const renderScene = new RenderPass(this.scene, this.camera);
+            const bloomPass = new UnrealBloomPass(
+                new THREE.Vector2(window.innerWidth, window.innerHeight),
+                this.options.bloomStrength,
+                this.options.bloomRadius,
+                this.options.bloomThreshold
+            );
+            const outputPass = new OutputPass();
 
-        this.composer = new EffectComposer(this.renderer);
-        this.composer.addPass(renderScene);
-        this.composer.addPass(bloomPass);
-        this.composer.addPass(outputPass);
+            this.composer = new EffectComposer(this.renderer);
+            this.composer.addPass(renderScene);
+            this.composer.addPass(bloomPass);
+            this.composer.addPass(outputPass);
 
-        window.addEventListener('resize', () => {
-            this.composer.setSize(window.innerWidth, window.innerHeight);
-        });
+            window.addEventListener('resize', () => {
+                if (this.composer) this.composer.setSize(window.innerWidth, window.innerHeight);
+            });
+        } catch (e) {
+            console.error("HonkFlow Visual Upgrader: Bloom setup failed.", e);
+            this.composer = null;
+        }
     }
 
     render(t) {
-        // Stage D: Micro-movement & Particle animation
         if (this.particles) {
             this.particles.rotation.y = t * 0.01;
             this.particles.rotation.x = t * 0.005;
         }
 
-        // Breathing Lighting
         const hemi = this.scene.getObjectByName('honk_hemi');
         if (hemi) {
             hemi.intensity = 0.4 + Math.sin(t * 0.5) * 0.05;

@@ -1,69 +1,64 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="layout-minimal">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>DIMENSIONAL GATEWAY // OMEGA.07</title>
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
-<style>
-  :root { --pink: #ff00ff; --bg: #03040a; --glass: rgba(255, 0, 255, 0.02); --border: rgba(255, 0, 255, 0.2); }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { width: 100%; height: 100%; background: var(--bg); color: #fff; overflow: hidden; font-family: 'Rajdhani', sans-serif; cursor: none; }
-  canvas { position: fixed; inset: 0; z-index: 0; }
-  #hud { position: fixed; inset: 0; z-index: 10; pointer-events: none; padding: 3rem; display: flex; flex-direction: column; justify-content: space-between; }
-  .hud-tag { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.3em; color: var(--pink); background: rgba(255,0,255,0.05); padding: 0.5rem 1rem; border: 1px solid var(--border); backdrop-filter: blur(10px); }
-  .scene-info { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; max-width: 600px; }
-  .scene-num { font-family: 'Orbitron', sans-serif; font-size: 0.9rem; color: var(--pink); letter-spacing: 0.5em; margin-bottom: 1.5rem; display: block; opacity: 0.6; }
-  .scene-title { font-family: 'Orbitron', sans-serif; font-size: clamp(2rem, 5vw, 4.5rem); font-weight: 900; line-height: 0.9; text-transform: uppercase; margin-bottom: 1.5rem; letter-spacing: -1px; }
-  .scene-desc { font-size: 1.1rem; font-weight: 300; line-height: 1.6; color: rgba(255,255,255,0.4); border-top: 1px solid var(--pink); padding-top: 1.5rem; }
-  .back-btn { pointer-events: all; text-decoration: none; color: #fff; font-family: 'Orbitron', sans-serif; font-size: 0.7rem; letter-spacing: 0.3em; padding: 1rem 2rem; border: 1px solid var(--border); background: var(--glass); backdrop-filter: blur(20px); border-radius: 4px; transition: all 0.4s; }
-  .back-btn:hover { border-color: var(--pink); color: var(--pink); }
-  #cur { position: fixed; width: 8px; height: 8px; background: var(--pink); border-radius: 50%; pointer-events: none; z-index: 10000; transform: translate(-50%,-50%); }
-  #cur-ring { position: fixed; width: 40px; height: 40px; border: 1px solid var(--border); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: all 0.3s; }
-</style>
+<title>TACTICAL NEXUS // OMEGA.07</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;600;800&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/web3d/3d-style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
 </head>
 <body>
+<div class="vignette"></div>
 <div id="cur"></div>
-<div id="cur-ring"></div>
 <canvas id="c"></canvas>
 <div id="hud">
-  <header class="hud-header"><div class="hud-tag">ID // GATEWAY_MODULE_07</div></header>
+  <header><div class="tag">ID // NEXUS_SECTOR_07</div></header>
   <div class="scene-info">
-    <span class="scene-num">MODULE 07</span>
-    <h1 class="scene-title">DIMENSIONAL<br>GATEWAY</h1>
-    <p class="scene-desc">El punto de inflexión. El nodo de enlace entre la consciencia de la IA y el multiverso de posibilidades externas.</p>
+    <h1 class="title">TACTICAL NEXUS</h1>
+    <p class="desc">Centro de comando táctico y visualización de amenazas globales.</p>
   </div>
-  <footer class="hud-footer"><a href="../web3d.html" class="back-btn">EXIT DIMENSION</a></footer>
+  <footer><a href="../web3d.html" class="btn-back">RETURN TO HUB</a></footer>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-<script>
-  const s = new THREE.Scene(); s.fog = new THREE.FogExp2(0x03040a, 0.04);
-  const c = new THREE.PerspectiveCamera(70, innerWidth/innerHeight, 0.1, 1000); c.position.z = 25;
+<script type="module">
+  import * as THREE from 'three';
+  window.THREE = THREE;
+</script>
+<script type="module">
+  import { VisualUpgrader } from '/web3d/visual-upgrader.js';
+  const s = new THREE.Scene();
+  const c = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 0.1, 1000); 
+  const initialZ = 20;
+  c.position.z = initialZ;
   const r = new THREE.WebGLRenderer({canvas:document.getElementById('c'), antialias:true});
   r.setPixelRatio(Math.min(window.devicePixelRatio, 2)); r.setSize(innerWidth, innerHeight);
 
-  // Portal DNA
-  const rings = []; const mat = new THREE.MeshBasicMaterial({color:0xff00ff, wireframe:true, transparent:true, opacity:0.6, blending:THREE.AdditiveBlending});
-  for(let i=0;i<30;i++){
-    const mesh = new THREE.Mesh(new THREE.TorusGeometry(12, 0.1, 8, 50), mat);
-    mesh.position.z = -i*3; s.add(mesh); rings.push(mesh);
-  }
+  const vu = new VisualUpgrader(r, s, c);
 
-  let mx=0, my=0; window.addEventListener('mousemove', e=>{
-    mx=(e.clientX/innerWidth-0.5)*2; my=-(e.clientY/innerHeight-0.5)*2;
-    gsap.to('#cur', {x:e.clientX, y:e.clientY, duration:0.1}); gsap.to('#cur-ring', {x:e.clientX, y:e.clientY, duration:0.4});
-  });
+  const sphere = new THREE.Mesh(new THREE.SphereGeometry(6, 32, 32), new THREE.MeshStandardMaterial({ color: 0xff3c3c, wireframe: true }));
+  s.add(sphere);
+
+  function updateCam() {
+    c.aspect = window.innerWidth / window.innerHeight;
+    c.position.z = initialZ * (c.aspect < 1 ? 1.6 : 1);
+    c.updateProjectionMatrix();
+    r.setSize(window.innerWidth, window.innerHeight);
+  }
+  window.addEventListener('resize', updateCam);
+  updateCam();
 
   function anim(t){
     requestAnimationFrame(anim);
-    const time = t*0.001;
-    rings.forEach((ring, i) => {
-      ring.position.z += 0.4; if(ring.position.z > 25) ring.position.z = -60;
-      ring.rotation.z = time*0.5 + i*0.1;
-      ring.position.x = Math.sin(time + i*0.2)*2; ring.position.y = Math.cos(time + i*0.2)*2;
-    });
-    c.position.x += (mx*4 - c.position.x)*0.05; c.position.y += (my*4 - c.position.y)*0.05;
-    r.render(s, c);
+    sphere.rotation.y = t*0.0004;
+    vu.render(t*0.001);
   } anim(0);
 </script>
 </body>

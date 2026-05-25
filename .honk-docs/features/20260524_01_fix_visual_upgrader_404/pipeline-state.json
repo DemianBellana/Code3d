@@ -1,0 +1,19 @@
+{
+    "feature_id": "20260524_01_fix_visual_upgrader_404",
+    "feature_name": "Fix VisualUpgrader 404",
+    "status": "completed",
+    "current_phase": "archive",
+    "current_phase_attempt": 1,
+    "started_at": "2026-05-24T19:25:00Z",
+    "completed_at": "2026-05-24T19:50:00Z",
+    "pipeline_flow": [
+        "explore",
+        "spec",
+        "design",
+        "tasks",
+        "apply",
+        "verify"
+    ],
+    "blocked_on": null,
+    "last_error": null
+}

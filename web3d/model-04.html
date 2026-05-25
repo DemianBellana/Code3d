@@ -4,6 +4,14 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>OPERATING CONSCIOUSNESS // OMEGA.04</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
 <style>
   :root { --cyan: #00f0ff; --violet: #a855f7; --white: #ffffff; --bg: #03040a; --glass: rgba(255, 255, 255, 0.02); --border: rgba(255, 255, 255, 0.08); }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -38,13 +46,20 @@
   </div>
   <footer class="hud-footer"><a href="../web3d.html" class="back-btn">RETURN TO HUB</a></footer>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-<script>
+<script type="module">
+  import * as THREE from 'three';
+  window.THREE = THREE;
+</script>
+<script type="module">
+  import { VisualUpgrader } from '/web3d/visual-upgrader.js';
   const s = new THREE.Scene(); s.fog = new THREE.FogExp2(0x03040a, 0.06);
   const c = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 1000); c.position.set(0, 10, 20);
   const r = new THREE.WebGLRenderer({canvas:document.getElementById('c'), antialias:true});
   r.setPixelRatio(Math.min(window.devicePixelRatio, 2)); r.setSize(innerWidth, innerHeight);
+
+  const vu = new VisualUpgrader(r, s, c);
+  window.vu = vu;
 
   // Tactical Ring DNA
   const rings = []; const mat = new THREE.MeshBasicMaterial({color:0x00f0ff, wireframe:true, transparent:true, opacity:0.1});
@@ -71,7 +86,7 @@
     rings.forEach((ring, i) => { ring.rotation.z = time * (0.1 + i*0.05); ring.scale.setScalar(1 + Math.sin(time + i)*0.02); });
     data.rotation.y = time*0.02;
     c.position.x += (mx*15 - c.position.x)*0.05; c.position.y += (10 + my*10 - c.position.y)*0.05; c.lookAt(0,0,0);
-    r.render(s, c);
+    vu.render(time);
   } anim(0);
 </script>
 </body>

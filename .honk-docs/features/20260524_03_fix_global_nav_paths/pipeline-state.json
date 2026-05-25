@@ -1,0 +1,19 @@
+{
+    "feature_id": "20260524_03_fix_global_nav_paths",
+    "feature_name": "Fix Global Navigation Paths",
+    "status": "completed",
+    "current_phase": "archive",
+    "current_phase_attempt": 1,
+    "started_at": "2026-05-24T19:38:00Z",
+    "completed_at": "2026-05-24T19:48:00Z",
+    "pipeline_flow": [
+        "explore",
+        "spec",
+        "design",
+        "tasks",
+        "apply",
+        "verify"
+    ],
+    "blocked_on": null,
+    "last_error": null
+}

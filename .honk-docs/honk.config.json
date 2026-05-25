@@ -1,0 +1,83 @@
+{
+    "version":  "1.1.0",
+    "project":  "HonkFlow",
+    "artifact_store":  {
+                           "root":  ".honk-docs",
+                           "context_injection":  {
+                                                     "primary":  "graphify",
+                                                     "fallback":  "precompile",
+                                                     "graphify":  {
+                                                                      "enabled":  true,
+                                                                      "index_paths":  [
+                                                                                          "./.honk-docs"
+                                                                                      ],
+                                                                      "model":  "claude-sonnet-4-6",
+                                                                      "graceful_degradation":  true
+                                                                  },
+                                                     "precompile":  {
+                                                                        "enabled":  true,
+                                                                        "path":  "./.honk-docs/_precompile"
+                                                                    }
+                                                 }
+                       },
+    "models":  {
+                   "default":  "claude-sonnet-4-6",
+                   "design":  "claude-opus-4-6"
+               },
+    "pipeline":  {
+                     "flows":  {
+                                   "default_flow":  [
+                                                        "explore",
+                                                        "propose",
+                                                        "spec",
+                                                        "design",
+                                                        "tasks",
+                                                        "apply",
+                                                        "verify",
+                                                        "archive"
+                                                    ],
+                                   "technical_flow":  [
+                                                          "explore",
+                                                          "design",
+                                                          "spec",
+                                                          "tasks",
+                                                          "apply",
+                                                          "verify"
+                                                      ],
+                                   "quick_flow":  [
+                                                      "spec",
+                                                      "design",
+                                                      "tasks",
+                                                      "apply",
+                                                      "verify"
+                                                  ],
+                                   "bugfix_flow":  [
+                                                       "explore",
+                                                       "spec",
+                                                       "design",
+                                                       "tasks",
+                                                       "apply",
+                                                       "verify"
+                                                   ],
+                                   "refactor_flow":  [
+                                                         "explore",
+                                                         "design",
+                                                         "tasks",
+                                                         "apply",
+                                                         "verify"
+                                                     ]
+                               }
+                 },
+    "retry_policy":  {
+                         "phase_max_retries":  2,
+                         "apply_verify_loop_max":  3
+                     },
+    "features":  {
+                     "auto_flow_start":  false
+                 },
+    "gemini_integration":  {
+                               "use_native_skills":  true,
+                               "persistence_path":  "C:\\Users\\usuario 1\\.claude",
+                               "log_level":  "debug"
+                           }
+}

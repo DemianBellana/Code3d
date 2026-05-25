@@ -2,77 +2,88 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>NEURAL CHAMBER // OMEGA.05</title>
+<title>CYBERNETIC GRID // OMEGA.05</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
 <style>
-  :root { --gold: #c8a97a; --bg: #03040a; --glass: rgba(255, 255, 255, 0.02); --border: rgba(200, 169, 122, 0.2); }
+  :root { --green: #00ff00; --bg: #03040a; --glass: rgba(0, 255, 0, 0.02); --border: rgba(0, 255, 0, 0.2); }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   html, body { width: 100%; height: 100%; background: var(--bg); color: #fff; overflow: hidden; font-family: 'Rajdhani', sans-serif; cursor: none; }
   canvas { position: fixed; inset: 0; z-index: 0; }
   #hud { position: fixed; inset: 0; z-index: 10; pointer-events: none; padding: 3rem; display: flex; flex-direction: column; justify-content: space-between; }
-  .hud-tag { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.3em; color: var(--gold); background: rgba(200,169,122,0.05); padding: 0.5rem 1rem; border: 1px solid var(--border); backdrop-filter: blur(10px); }
-  .scene-info { position: absolute; top: 50%; right: 8vw; transform: translateY(-50%); max-width: 500px; text-align: right; }
-  .scene-num { font-family: 'Orbitron', sans-serif; font-size: 0.9rem; color: var(--gold); letter-spacing: 0.5em; margin-bottom: 1.5rem; display: block; opacity: 0.6; }
+  .hud-tag { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.3em; color: var(--green); background: rgba(0,255,0,0.05); padding: 0.5rem 1rem; border: 1px solid var(--border); backdrop-filter: blur(10px); }
+  .scene-info { position: absolute; bottom: 8vh; left: 8vw; max-width: 500px; }
+  .scene-num { font-family: 'Orbitron', sans-serif; font-size: 0.9rem; color: var(--green); letter-spacing: 0.5em; margin-bottom: 1.5rem; display: block; opacity: 0.6; }
   .scene-title { font-family: 'Orbitron', sans-serif; font-size: clamp(2rem, 5vw, 4.5rem); font-weight: 900; line-height: 0.9; text-transform: uppercase; margin-bottom: 1.5rem; letter-spacing: -1px; }
-  .scene-desc { font-size: 1.1rem; font-weight: 300; line-height: 1.6; color: rgba(255,255,255,0.5); border-right: 2px solid var(--gold); padding-right: 1.5rem; }
+  .scene-desc { font-size: 1.1rem; font-weight: 300; line-height: 1.6; color: rgba(255,255,255,0.5); border-left: 2px solid var(--green); padding-left: 1.5rem; }
   .back-btn { pointer-events: all; text-decoration: none; color: #fff; font-family: 'Orbitron', sans-serif; font-size: 0.7rem; letter-spacing: 0.3em; padding: 1rem 2rem; border: 1px solid var(--border); background: var(--glass); backdrop-filter: blur(20px); border-radius: 4px; transition: all 0.4s; }
-  .back-btn:hover { border-color: var(--gold); color: var(--gold); }
-  #cur { position: fixed; width: 8px; height: 8px; background: var(--gold); border-radius: 50%; pointer-events: none; z-index: 10000; transform: translate(-50%,-50%); }
+  .back-btn:hover { border-color: var(--green); background: rgba(0,255,0,0.05); }
+  #cur { position: fixed; width: 8px; height: 8px; background: var(--green); border-radius: 50%; pointer-events: none; z-index: 10000; transform: translate(-50%,-50%); }
   #cur-ring { position: fixed; width: 40px; height: 40px; border: 1px solid var(--border); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: all 0.3s; }
-  .vignette { position: fixed; inset: 0; background: radial-gradient(circle at 50% 50%, transparent 30%, #000 140%); z-index: 5; pointer-events: none; }
 </style>
 </head>
 <body>
-<div class="vignette"></div>
 <div id="cur"></div>
 <div id="cur-ring"></div>
 <canvas id="c"></canvas>
 <div id="hud">
-  <header class="hud-header"><div class="hud-tag">ID // LUXURY_CHAMBER_05</div></header>
+  <header class="hud-header"><div class="hud-tag">ID // CYBER_GRID_05</div></header>
   <div class="scene-info">
     <span class="scene-num">MODULE 05</span>
-    <h1 class="scene-title">NEURAL<br>CHAMBER</h1>
-    <p class="scene-desc">El centro de estética y refinamiento sensorial. La IA procesa aquí la belleza mediante algoritmos de metal líquido y luz dorada.</p>
+    <h1 class="scene-title">CYBERNETIC<br>GRID</h1>
+    <p class="scene-desc">La matriz de transporte de información. Una infraestructura de baja latencia donde los paquetes de datos fluyen como torrentes de luz esmeralda.</p>
   </div>
   <footer class="hud-footer"><a href="../web3d.html" class="back-btn">RETURN TO HUB</a></footer>
 </div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-<script>
+<script type="module">
+  import * as THREE from 'three';
+  window.THREE = THREE;
+</script>
+<script type="module">
+  import { VisualUpgrader } from '/web3d/visual-upgrader.js';
   const s = new THREE.Scene(); s.fog = new THREE.FogExp2(0x03040a, 0.05);
-  const c = new THREE.PerspectiveCamera(45, innerWidth/innerHeight, 0.1, 100); c.position.z = 20;
+  const c = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 1000); c.position.set(0, 15, 30);
   const r = new THREE.WebGLRenderer({canvas:document.getElementById('c'), antialias:true});
   r.setPixelRatio(Math.min(window.devicePixelRatio, 2)); r.setSize(innerWidth, innerHeight);
 
-  // Liquid Gold Sphere DNA
-  const geo = new THREE.SphereGeometry(5, 128, 128);
-  const mat = new THREE.MeshStandardMaterial({color:0xc8a97a, metalness:1, roughness:0.1});
-  const sphere = new THREE.Mesh(geo, mat); s.add(sphere);
+  const vu = new VisualUpgrader(r, s, c);
+  window.vu = vu;
 
-  const l1 = new THREE.PointLight(0xffffff, 2, 50); l1.position.set(10, 10, 10); s.add(l1);
-  const l2 = new THREE.PointLight(0xc8a97a, 4, 50); l2.position.set(-10, -5, 10); s.add(l2);
-  s.add(new THREE.AmbientLight(0x222222));
+  // Cyber Grid DNA
+  const geo = new THREE.PlaneGeometry(200, 200, 50, 50);
+  const mat = new THREE.MeshBasicMaterial({color:0x00ff00, wireframe:true, transparent:true, opacity:0.2});
+  const grid = new THREE.Mesh(geo, mat); grid.position.y = -10; s.add(grid);
+
+  const pCount = 5000; const pPos = new Float32Array(pCount*3);
+  for(let i=0;i<pCount;i++){ pPos[i*3]=(Math.random()-0.5)*100; pPos[i*3+1]=Math.random()*40; pPos[i*3+2]=(Math.random()-0.5)*100; }
+  const pGeo = new THREE.BufferGeometry(); pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+  const pMat = new THREE.PointsMaterial({color:0x00ff00, size:0.1, transparent:true, opacity:0.8});
+  const data = new THREE.Points(pGeo, pMat); s.add(data);
 
   let mx=0, my=0; window.addEventListener('mousemove', e=>{
     mx=(e.clientX/innerWidth-0.5)*2; my=-(e.clientY/innerHeight-0.5)*2;
     gsap.to('#cur', {x:e.clientX, y:e.clientY, duration:0.1}); gsap.to('#cur-ring', {x:e.clientX, y:e.clientY, duration:0.4});
   });
 
-  const origPos = geo.attributes.position.clone();
   function anim(t){
     requestAnimationFrame(anim);
     const time = t*0.001;
-    const pos = geo.attributes.position;
-    for(let i=0; i<pos.count; i++){
-      const v = new THREE.Vector3().fromBufferAttribute(origPos, i);
-      const noise = Math.sin(v.x*2 + time) * Math.cos(v.y*2 + time);
-      v.multiplyScalar(1 + noise*0.04);
-      pos.setXYZ(i, v.x, v.y, v.z);
-    }
-    pos.needsUpdate = true; geo.computeVertexNormals();
-    sphere.rotation.y = time*0.1;
-    c.position.x += (mx*5 - c.position.x)*0.05; c.position.y += (my*5 - c.position.y)*0.05; c.lookAt(0,0,0);
-    r.render(s, c);
+    const pos = geo.attributes.position.array;
+    for(let i=0; i<pos.length; i+=3){ pos[i+1] = Math.sin(pos[i]*0.1 + time)*2 + Math.cos(pos[i+2]*0.1 + time)*2; }
+    geo.attributes.position.needsUpdate = true;
+    const rpos = pGeo.attributes.position.array;
+    for(let i=0; i<pCount; i++){ rpos[i*3+1] -= 0.4; if(rpos[i*3+1] < -10) rpos[i*3+1] = 40; }
+    pGeo.attributes.position.needsUpdate = true;
+    c.position.x += (mx*10 - c.position.x)*0.05; c.position.y += (5 + my*5 - c.position.y)*0.05; c.lookAt(0,0,0);
+    vu.render(time);
   } anim(0);
 </script>
 </body>
