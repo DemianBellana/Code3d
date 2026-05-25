@@ -196,12 +196,97 @@
       font-size: 0.8rem;
     }
 
-    /* ── RESPONSIVE ── */
+    /* ── PROFESSIONAL MEDIA QUERIES (HonkFlow: Responsive-First) ── */
+    
+    /* TABLET (1024px) */
+    @media (max-width: 1024px) {
+      .showcase-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+        padding: 3rem 5vw;
+      }
+      .hero-title { font-size: 4.5rem; }
+    }
+
+    /* SMALL TABLET / MOBILE LARGE (768px) */
     @media (max-width: 768px) {
+      nav {
+        padding: 1.2rem 5vw;
+      }
       .nav-links { display: none; }
-      .showcase-grid { grid-template-columns: 1fr; }
-      .hero { padding-top: 8rem; }
-      .hero-title { font-size: 3.5rem; }
+      
+      .hero {
+        padding: 8rem 5vw 3rem;
+      }
+      .hero-title { font-size: 3.5rem; line-height: 1.1; }
+      .hero-sub { font-size: 1.1rem; }
+
+      .showcase-grid {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+        padding: 2rem 6vw 6rem;
+      }
+
+      .lp-card {
+        border-radius: 16px;
+      }
+      
+      .lp-preview {
+        height: 220px;
+      }
+
+      .lp-info {
+        padding: 1.75rem;
+      }
+
+      .lp-name { font-size: 1.35rem; }
+      .lp-btn { width: 100%; padding: 1rem; font-size: 0.9rem; }
+    }
+
+    /* MOBILE SMALL (480px) */
+    @media (max-width: 480px) {
+      .hero {
+        padding: 7rem 6vw 2rem;
+        text-align: left;
+      }
+      .hero-title { 
+        font-size: 2.8rem; 
+        letter-spacing: -0.01em;
+      }
+      .hero-sub {
+        font-size: 1rem;
+        line-height: 1.5;
+        margin: 0;
+      }
+
+      .showcase-grid {
+        padding: 2rem 6vw 5rem;
+        gap: 2rem;
+      }
+
+      .lp-preview {
+        height: 200px;
+      }
+
+      .lp-info {
+        padding: 1.5rem;
+      }
+
+      .lp-desc {
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+      }
+
+      footer {
+        padding: 3rem 6vw;
+        font-size: 0.7rem;
+      }
+    }
+
+    /* Fix potential horizontal overflow on small devices */
+    html, body {
+      max-width: 100%;
+      overflow-x: hidden;
     }
   </style>
 </head>
