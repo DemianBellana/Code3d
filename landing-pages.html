@@ -114,24 +114,34 @@
       overflow: hidden;
     }
 
-    /* Placeholder gradients per card type */
-    .lp-preview::before {
+    /* Thumbnail Engine (HonkFlow: UI-Upgrade) */
+    .lp-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top;
+      transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+      opacity: 0.85;
+    }
+
+    .lp-card:hover .lp-img {
+      transform: scale(1.08);
+      opacity: 1;
+    }
+
+    /* Loading State Placeholder */
+    .lp-preview::after {
       content: '';
       position: absolute;
       inset: 0;
-      opacity: 0.4;
-      transition: transform 0.8s;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.03), transparent);
+      transform: translateX(-100%);
+      animation: skeleton 2s infinite;
+      pointer-events: none;
     }
-    .lp-card:hover .lp-preview::before {
-      transform: scale(1.1);
+    @keyframes skeleton {
+      100% { transform: translateX(100%); }
     }
-
-    .lp-card.saas .lp-preview::before { background: linear-gradient(135deg, #4f46e5, #06b6d4); }
-    .lp-card.web3 .lp-preview::before { background: linear-gradient(135deg, #8b5cf6, #ec4899); }
-    .lp-card.startup .lp-preview::before { background: linear-gradient(135deg, #10b981, #3b82f6); }
-    .lp-card.portfolio .lp-preview::before { background: linear-gradient(135deg, #f59e0b, #ef4444); }
-    .lp-card.agency .lp-preview::before { background: linear-gradient(135deg, #6366f1, #a855f7); }
-    .lp-card.product .lp-preview::before { background: linear-gradient(135deg, #f43f5e, #fb923c); }
 
     .lp-info {
       padding: 2rem;
@@ -215,62 +225,74 @@
   </section>
 
   <main class="showcase-grid">
-    <!-- SaaS Landing -->
-    <article class="lp-card saas">
-      <div class="lp-preview"></div>
+    <!-- Landing Pro (Real Project Linked) -->
+    <article class="lp-card">
+      <div class="lp-preview">
+        <img src="thumbnails/landing-pro.webp" alt="Landing Pro Preview" class="lp-img" onerror="this.src='https://placehold.co/600x400/111/444?text=Landing+Pro'">
+      </div>
       <div class="lp-info">
-        <h3 class="lp-name">SaaS Landing</h3>
-        <p class="lp-desc">High-conversion layout for software-as-a-service platforms. Clean, data-driven, and trust-focused.</p>
+        <h3 class="lp-name">Landing Pro</h3>
+        <p class="lp-desc">High-performance landing page system with cinematic 3D elements and optimized conversion funnels.</p>
+        <a href="web3-landing-demo/index.html" class="lp-btn">Preview</a>
+      </div>
+    </article>
+
+    <!-- Nova Studio -->
+    <article class="lp-card">
+      <div class="lp-preview">
+        <img src="thumbnails/nova-studio.webp" alt="Nova Studio Preview" class="lp-img" onerror="this.src='https://placehold.co/600x400/111/444?text=Nova+Studio'">
+      </div>
+      <div class="lp-info">
+        <h3 class="lp-name">Nova Studio</h3>
+        <p class="lp-desc">Minimalist portfolio for creative agencies. Focus on typography, whitespace, and smooth transitions.</p>
         <a href="#" class="lp-btn">Preview</a>
       </div>
     </article>
 
-    <!-- Web3 Landing -->
-    <article class="lp-card web3">
-      <div class="lp-preview"></div>
+    <!-- Orbit AI -->
+    <article class="lp-card">
+      <div class="lp-preview">
+        <img src="thumbnails/orbit-ai.webp" alt="Orbit AI Preview" class="lp-img" onerror="this.src='https://placehold.co/600x400/111/444?text=Orbit+AI'">
+      </div>
       <div class="lp-info">
-        <h3 class="lp-name">Web3 Landing</h3>
-        <p class="lp-desc">Futuristic interface for decentralized protocols and crypto assets. Immersive dark mode aesthetics.</p>
+        <h3 class="lp-name">Orbit AI</h3>
+        <p class="lp-desc">Interactive interface for AI-driven platforms. Features real-time data visualization and dark UI.</p>
         <a href="#" class="lp-btn">Preview</a>
       </div>
     </article>
 
-    <!-- Startup Landing -->
-    <article class="lp-card startup">
-      <div class="lp-preview"></div>
+    <!-- Agency X -->
+    <article class="lp-card">
+      <div class="lp-preview">
+        <img src="thumbnails/agency-x.webp" alt="Agency X Preview" class="lp-img" onerror="this.src='https://placehold.co/600x400/111/444?text=Agency+X'">
+      </div>
       <div class="lp-info">
-        <h3 class="lp-name">Startup Landing</h3>
-        <p class="lp-desc">Dynamic and bold design to capture market attention and accelerate early-stage growth.</p>
+        <h3 class="lp-name">Agency X</h3>
+        <p class="lp-desc">Authority-building landing for professional consulting. Clean, corporate, and performance-ready.</p>
         <a href="#" class="lp-btn">Preview</a>
       </div>
     </article>
 
-    <!-- Portfolio Landing -->
-    <article class="lp-card portfolio">
-      <div class="lp-preview"></div>
+    <!-- Project Omega -->
+    <article class="lp-card">
+      <div class="lp-preview">
+        <img src="thumbnails/project-omega.webp" alt="Project Omega Preview" class="lp-img" onerror="this.src='https://placehold.co/600x400/111/444?text=Project+Omega'">
+      </div>
       <div class="lp-info">
-        <h3 class="lp-name">Portfolio Landing</h3>
-        <p class="lp-desc">Bespoke layouts for creatives and engineers. Showcase your work with absolute clarity and style.</p>
+        <h3 class="lp-name">Project Omega</h3>
+        <p class="lp-desc">Experimental storytelling for hardware launches. Immersive scroll-driven experience.</p>
         <a href="#" class="lp-btn">Preview</a>
       </div>
     </article>
 
-    <!-- Agency Landing -->
-    <article class="lp-card agency">
-      <div class="lp-preview"></div>
-      <div class="lp-info">
-        <h3 class="lp-name">Agency Landing</h3>
-        <p class="lp-desc">Professional and authoritative design for high-end service providers and consulting firms.</p>
-        <a href="#" class="lp-btn">Preview</a>
+    <!-- Helios Web -->
+    <article class="lp-card">
+      <div class="lp-preview">
+        <img src="thumbnails/helios-web.webp" alt="Helios Web Preview" class="lp-img" onerror="this.src='https://placehold.co/600x400/111/444?text=Helios+Web'">
       </div>
-    </article>
-
-    <!-- Product Launch Landing -->
-    <article class="lp-card product">
-      <div class="lp-preview"></div>
       <div class="lp-info">
-        <h3 class="lp-name">Product Launch</h3>
-        <p class="lp-desc">Focused storytelling for new hardware or software releases. Conversion-driven at every scroll.</p>
+        <h3 class="lp-name">Helios Web</h3>
+        <p class="lp-desc">E-commerce landing for high-end boutique brands. Luxury aesthetics with rapid load speeds.</p>
         <a href="#" class="lp-btn">Preview</a>
       </div>
     </article>
